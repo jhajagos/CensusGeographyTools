@@ -30,6 +30,7 @@ import json
 import csv
 import re
 
+
 def main():
     """
     States:
@@ -84,7 +85,7 @@ def main():
                             "table id": table_id,
                             "subject area": subject_area,
                             "sequence number": sequence_number,
-                            "start position": start_position,
+                            "start position": int(start_position),
                             "universe": None,
                             "fields": []
                         }
@@ -107,7 +108,7 @@ def main():
                                 table_id = row_dict["Table ID"]
                                 subject_area = row_dict["Subject Area"]
                                 sequence_number = row_dict["Sequence Number"]
-                                start_position = row_dict["Start Position"]
+                                start_position = int(row_dict["Start Position"])
 
                                 table_sequence_mappings[table_id] = {
                                     "table name": table_name,
@@ -122,10 +123,17 @@ def main():
 
                         elif len(row_dict["Line Number"].strip()):
                             field_name = row_dict["Table Title"]
+                            modified_field_name = field_name
+                            if modified_field_name[-1] == ":":
+                                modified_field_name = modified_field_name[:-1]
                             position = row_dict["Line Number"]
-                            table_sequence_mappings[table_id]["fields"] += [
-                                {"row": i, "context path": context_path, "position": position,
-                                 "field name": field_name}]
+
+                            if "." not in position:
+                                table_sequence_mappings[table_id]["fields"] += [
+                                    {"row": i, "context path": list(context_path), "relative position": int(position),
+                                     "field name": modified_field_name, "table position": int(start_position) + int(position)}]
+                            else:
+                                pass # Record medians
 
                             if field_name[-1] == ":":
                                 if len(context_path) > 1:
