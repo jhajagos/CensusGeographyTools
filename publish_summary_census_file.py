@@ -3,7 +3,7 @@ import json
 import csv
 import glob
 import os
-
+import argparse
 
 
 def pad_number(number, length):
@@ -14,8 +14,9 @@ def pad_number(number, length):
     else:
         return string_number
 
+
 def main(table_to_publish, directory, state="NY", reference_year="2012", period_covered="5", iteration="000",
-         file_types = ["e"]):
+         file_types = ["e", "m"]):
 
     # Sequence number mapping
 
@@ -36,7 +37,6 @@ def main(table_to_publish, directory, state="NY", reference_year="2012", period_
         sequence_number_string = pad_number(sequence_number, 4)
 
         suffix_file = reference_year + period_covered + state.lower() + sequence_number_string + iteration + ".txt"
-        print(suffix_file)
 
         for file_type in file_types:
             file_to_write = os.path.join(directory, file_type + reference_year + period_covered + state.lower() + table_to_publish + ".csv")
@@ -49,7 +49,7 @@ def main(table_to_publish, directory, state="NY", reference_year="2012", period_
                 field_dict[FIELD_LAYOUT[i]] = i
 
             if os.path.exists(file_to_read):
-                print("file exists")
+                print("Census file exists")
 
                 with open(file_to_read, "r") as f:
                     cr = csv.reader(f)
@@ -80,9 +80,6 @@ def main(table_to_publish, directory, state="NY", reference_year="2012", period_
 
                                 row_to_write_template += [table_name, subject]
 
-                                # print(table_data)
-                                # exit()
-
                                 for field in table_data["fields"]:
                                     row_to_write = list(row_to_write_template)
                                     relative_position = field["relative position"]
@@ -95,9 +92,12 @@ def main(table_to_publish, directory, state="NY", reference_year="2012", period_
                                     row_to_write += [value]
                                     cwr.writerow(row_to_write)
             else:
-                print("File %s does not exist" % file_to_read)
+                print("File '%s' does not exist" % file_to_read)
     else:
-        print("Table not in mapping file")
+        print("Table '%s' not in mapping file" % table_to_publish)
 
 if __name__ == "__main__":
-    main("B01001", "C:\Users\\janos\\Downloads\\NewYork_All_Geographies_Tracts_Block_Groups_Only\\")
+    parser = argparse.ArgumentParser()
+
+
+    main("B16002", "C:\Users\\janos\\Downloads\\NewYork_All_Geographies_Tracts_Block_Groups_Only\\")

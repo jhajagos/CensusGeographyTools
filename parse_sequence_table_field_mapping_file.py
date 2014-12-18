@@ -151,12 +151,11 @@ def main():
                                             groups = match.groups()
                                             if field_name == "Other " + groups[0]:
                                                 context_path.pop()
-
-
             i += 1
 
     with open("./support_files/table_number_to_sequence_number.json", "w") as fw:
         json.dump(table_sequence_mappings, fw,  sort_keys=True, indent=4, separators=(',', ': '))
 
 if __name__ == "__main__":
+
     main()
