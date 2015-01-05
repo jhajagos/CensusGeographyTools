@@ -16,7 +16,7 @@ def pad_number(number, length):
 
 
 def main(table_to_publish, directory, state="NY", reference_year="2012", period_covered="5", iteration="000",
-         file_types = ["e", "m"]):
+         file_types=["e", "m"]):
 
     # Sequence number mapping
 
