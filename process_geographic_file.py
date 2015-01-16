@@ -11,7 +11,7 @@ def main(path_to_geographic_file):
     with open("./support_files/2012_SFGeoFileTemplate.csv", "r") as f:
         cvr = csv.reader(f)
         header = cvr.next()
-        header_description = cvr.next()
+        header_description = cvr.next() #We do not need this
 
     with open(path_to_geographic_file, "r") as fc:
         cvd = csv.DictReader(fc, header)

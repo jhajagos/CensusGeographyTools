@@ -39,7 +39,7 @@ import os
 
 def main():
     """
-    Parse the CSV file and transform into a JSON representative
+    Parse the CSV file whcih lists the structure and transform into a JSON representative
 
     Parser States:
         Header

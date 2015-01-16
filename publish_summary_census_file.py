@@ -29,11 +29,18 @@ def main(table_to_publish, directory, state="NY", reference_year="2012", period_
     with open("./support_files/table_number_to_sequence_number.json") as fj:
         table_number_to_sequence_number = json.load(fj)
 
-    print("Loading geographic file ")
+    print("Loading geographic file which provides mapping")
     geographic_data_file = glob.glob(os.path.join(directory, "g*.json"))[0]
     print(geographic_data_file)
     with open(geographic_data_file, "r") as f:
         geographic_data = json.load(f)
+
+    variable_mapping_information_file = os.path.join(directory, "acs_files_generated.json")
+    if os.path.exists(variable_mapping_information_file):
+        with open(variable_mapping_information_file) as f:
+            variable_mapping_information_dict = json.load(f)
+    else:
+        variable_mapping_information_dict = {}
 
     if table_to_publish in table_number_to_sequence_number:
         table_data = table_number_to_sequence_number[table_to_publish]
@@ -43,12 +50,24 @@ def main(table_to_publish, directory, state="NY", reference_year="2012", period_
 
         suffix_file = reference_year + period_covered + state.lower() + sequence_number_string + iteration + ".txt"
 
+        if table_to_publish in variable_mapping_information_dict:
+            pass
+        else:
+            variable_mapping_information_dict[table_to_publish] = {}
+
         for file_type in file_types:
             file_to_write = os.path.join(directory, file_type + reference_year + period_covered + state.lower() + table_to_publish + ".csv")
             file_to_read = os.path.join(directory, file_type + suffix_file)
 
             FIELD_LAYOUT = ["FILEDID", "FILETYPE", "STUSAB", "CHARITER", "SEQUENCE", "LOGRECNO"]
             field_dict = {}
+
+            publishing_data_dict = {"file_name": file_to_write, "file_type": file_type, "reference_year": reference_year,
+                                    "period_covered": period_covered, "state": state,
+                                    "table_to_publish": table_to_publish}
+
+            variable_mapping_information_dict[table_to_publish][file_type] = publishing_data_dict
+
             for i in range(len(FIELD_LAYOUT)):
                 field_dict[FIELD_LAYOUT[i]] = i
 
@@ -57,7 +76,7 @@ def main(table_to_publish, directory, state="NY", reference_year="2012", period_
 
                 with open(file_to_read, "r") as f:
                     cr = csv.reader(f)
-                    print(file_to_write)
+                    print("Writing CSV file '%s'" % file_to_write)
                     with open(file_to_write, "wb") as fw:
                         cwr = csv.writer(fw)
                         cwr.writerow(["goeid", "geo_name", "table_id", "table_name", "subject area",
@@ -99,6 +118,9 @@ def main(table_to_publish, directory, state="NY", reference_year="2012", period_
                 print("File '%s' does not exist" % file_to_read)
     else:
         print("Table '%s' not in mapping file" % table_to_publish)
+
+    with open(variable_mapping_information_file, "w") as fw:
+        json.dump(variable_mapping_information_dict, fw, sort_keys=True, indent=4, separators=(',', ': '))
 
 if __name__ == "__main__":
 
