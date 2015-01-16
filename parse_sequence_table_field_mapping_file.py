@@ -1,6 +1,11 @@
 __author__ = 'janos'
 
 """
+Finding where an element is stored in the Census ACS Summary files is a challenge.
+"""
+
+
+"""
 File ID,Table ID,Sequence Number,Line Number,Start Position,Total Cells in Table,Total Cells in Sequence,Table Title,Subject Area
 ACSSF,B00001,1, ,7,1 CELL, ,UNWEIGHTED SAMPLE COUNT OF THE POPULATION,Unweighted Count
 ACSSF,B00001,1, , ,, ,Universe:  Total population,
@@ -29,11 +34,14 @@ ACSSF,B01002B,3,3, ,, ,Female,
 import json
 import csv
 import re
+import os
 
 
 def main():
     """
-    States:
+    Parse the CSV file and transform into a JSON representative
+
+    Parser States:
         Header
         New Table
         Universe Defined
@@ -56,11 +64,6 @@ def main():
         i = 0
         for row in csv_reader:
 
-            # if i == 100:
-            #     import pprint
-            #     pprint.pprint(table_sequence_mappings)
-            #     exit()
-            #print(state,i)
             if state == "Header":
                 header = row
                 for j in range(len(header)):
@@ -157,5 +160,4 @@ def main():
         json.dump(table_sequence_mappings, fw,  sort_keys=True, indent=4, separators=(',', ': '))
 
 if __name__ == "__main__":
-
     main()

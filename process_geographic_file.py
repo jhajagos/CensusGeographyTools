@@ -3,7 +3,8 @@ __author__ = 'janos'
 
 import csv
 import json
-import pprint
+import os
+
 
 def main(path_to_geographic_file):
 
@@ -30,6 +31,11 @@ def main(path_to_geographic_file):
         json.dump(logical_record_dict, fw, sort_keys=True, indent=4, separators=(',', ': '))
 
 
-
 if __name__ == "__main__":
-    main("C:\\Users\\janos\\Downloads\\NewYork_All_Geographies_Tracts_Block_Groups_Only\\g20125ny.csv")
+    try:
+        import config
+    except ImportError:
+        import config_example as config
+
+    geography_csv_file = os.path.join(config.geography_directory, config.geography_csv_file)
+    main(geography_csv_file)

@@ -3,10 +3,15 @@ import json
 import csv
 import glob
 import os
-import argparse
+
+"""
+Export an ACS variable identified "B16002" across all geographies that are identified.
+"""
 
 
 def pad_number(number, length):
+    """To left pad a number with zeros"""
+
     string_number = str(number)
     number_of_zeros = length - len(string_number)
     if number_of_zeros >= 0:
@@ -41,7 +46,6 @@ def main(table_to_publish, directory, state="NY", reference_year="2012", period_
         for file_type in file_types:
             file_to_write = os.path.join(directory, file_type + reference_year + period_covered + state.lower() + table_to_publish + ".csv")
             file_to_read = os.path.join(directory, file_type + suffix_file)
-
 
             FIELD_LAYOUT = ["FILEDID", "FILETYPE", "STUSAB", "CHARITER", "SEQUENCE", "LOGRECNO"]
             field_dict = {}
@@ -97,7 +101,12 @@ def main(table_to_publish, directory, state="NY", reference_year="2012", period_
         print("Table '%s' not in mapping file" % table_to_publish)
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
 
+    try:
+        import config
+    except ImportError:
+        import config_example as config
 
-    main("B16002", "C:\Users\\janos\\Downloads\\NewYork_All_Geographies_Tracts_Block_Groups_Only\\")
+    acs_fields = config.acs_fields_to_export
+    for acs_field in acs_fields:
+        main(acs_field, config.geography_directory)
