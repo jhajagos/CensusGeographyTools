@@ -111,7 +111,13 @@ def main(table_to_publish, directory, state="NY", reference_year="2012", period_
 
                                     row_to_write += [relative_position, context_path, file_type, field_name]
                                     absolute_position = field["table position"] - 1
-                                    value = row[absolute_position]
+                                    try:
+                                        value = row[absolute_position]
+                                    except IndexError:
+                                        print(table_data)
+                                        print(row, absolute_position, relative_position, field["table position"])
+                                        raise
+
                                     row_to_write += [value]
                                     cwr.writerow(row_to_write)
             else:

@@ -134,7 +134,8 @@ def main():
                             if "." not in position:
                                 table_sequence_mappings[table_id]["fields"] += [
                                     {"row": i, "context path": list(context_path), "relative position": int(position),
-                                     "field name": modified_field_name, "table position": int(start_position) + int(position)}]
+                                     "field name": modified_field_name,
+                                     "table position": int(start_position) + int(position) - 1}]
                             else:
                                 pass # Record medians
 
