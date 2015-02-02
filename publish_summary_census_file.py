@@ -20,7 +20,7 @@ def pad_number(number, length):
         return string_number
 
 
-def main(table_to_publish, directory, state="NY", reference_year="2012", period_covered="5", iteration="000",
+def main(table_to_publish, directory, geographic_unit="NY", reference_year="2013", years_covered="5", iteration="000",
          file_types=["e", "m"], abridged=False):
 
     """
@@ -58,7 +58,7 @@ def main(table_to_publish, directory, state="NY", reference_year="2012", period_
         sequence_number = table_data["sequence number"]
         sequence_number_string = pad_number(sequence_number, 4)
 
-        suffix_file = reference_year + period_covered + state.lower() + sequence_number_string + iteration + ".txt"
+        suffix_file = reference_year + years_covered + geographic_unit.lower() + sequence_number_string + iteration + ".txt"
 
         if table_to_publish in variable_mapping_information_dict:
             pass
@@ -71,14 +71,14 @@ def main(table_to_publish, directory, state="NY", reference_year="2012", period_
             else:
                 abridged = ""
 
-            file_to_write = os.path.join(directory, abridged + file_type + reference_year + period_covered + state.lower() + table_to_publish + ".csv")
+            file_to_write = os.path.join(directory, abridged + file_type + reference_year + years_covered + geographic_unit.lower() + table_to_publish + ".csv")
             file_to_read = os.path.join(directory, file_type + suffix_file)
 
             FIELD_LAYOUT = ["FILEDID", "FILETYPE", "STUSAB", "CHARITER", "SEQUENCE", "LOGRECNO"]
             field_dict = {}
 
             publishing_data_dict = {"file_name": file_to_write, "file_type": file_type, "reference_year": reference_year,
-                                    "period_covered": period_covered, "state": state,
+                                    "period_covered": years_covered, "state": geographic_unit,
                                     "table_to_publish": table_to_publish}
 
             variable_mapping_information_dict[table_to_publish][file_type] = publishing_data_dict
@@ -163,4 +163,5 @@ if __name__ == "__main__":
 
     acs_fields = config.acs_fields_to_export
     for acs_field in acs_fields:
-         main(acs_field, config.geography_directory)
+        main(acs_field, config.geography_directory, geographic_unit=config.geographic_unit,
+             reference_year=config.reference_year, years_covered=config.years_covered)

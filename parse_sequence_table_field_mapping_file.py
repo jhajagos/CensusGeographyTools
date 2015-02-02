@@ -53,7 +53,7 @@ def main():
 
     table_sequence_mappings = {}
 
-    with open("./support_files/Sequence_Number_and_Table_Number_Lookup.csv", "rb") as fc:
+    with open("./support_files/Sequence_Number_and_Table_Number_Lookup_2013.csv", "rb") as fc:
         csv_reader = csv.reader(fc)
         state = "Header"
         field_position_mappings = {}

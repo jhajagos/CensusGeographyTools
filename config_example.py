@@ -5,10 +5,13 @@ __author__ = 'janos'
 Path to the geography download
 """
 
-geography_directory = "C:\\Users\\janos\\Downloads\\NewYork_All_Geographies_Tracts_Block_Groups_Only\\"
+geography_directory = "H:\\data\\acs_summary_file\\NewYork_Tracts_Block_Groups_Only_2013\\"
 
-geography_csv_file = "g20125ny.csv"
-acs_fields_to_export = ["B00001", "B00002", "B01001", "B01002","B16002"]
+geography_csv_file = "g20135ny.csv"
+
+reference_year = "2013"
+years_covered = "5"
+geographic_unit = "NY"
 
 acs_fields_to_export = ["B00001",
 "B00002",
@@ -381,3 +384,5 @@ acs_fields_to_export = ["B00001",
 "C24020",
 "C24030",
 "C25095"]
+
+acs_fields_to_export = ["B00001", "B00002", "B01001", "B01002","B16002"]
