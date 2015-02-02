@@ -13,6 +13,7 @@ reference_year = "2013"
 years_covered = "5"
 geographic_unit = "NY"
 
+# No geographic limitations
 acs_fields_to_export = ["B00001",
 "B00002",
 "B01001",
@@ -384,5 +385,5 @@ acs_fields_to_export = ["B00001",
 "C24020",
 "C24030",
 "C25095"]
-
-acs_fields_to_export = ["B00001", "B00002", "B01001", "B01002","B16002"]
+#  For testing purposes
+# acs_fields_to_export = ["B00001", "B00002", "B01001", "B01002","B16002"]

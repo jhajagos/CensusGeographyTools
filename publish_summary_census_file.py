@@ -21,7 +21,7 @@ def pad_number(number, length):
 
 
 def main(table_to_publish, directory, geographic_unit="NY", reference_year="2013", years_covered="5", iteration="000",
-         file_types=["e", "m"], abridged=False):
+         file_types=["e", "m"], abridged=False, sequence_file_name="./support_files/table_number_to_sequence_number.json"):
 
     """
         file_types :
@@ -36,7 +36,8 @@ def main(table_to_publish, directory, geographic_unit="NY", reference_year="2013
     """
 
     print("Loading table to sequence file mappings")
-    with open("./support_files/table_number_to_sequence_number.json") as fj:
+
+    with open(sequence_file_name) as fj:
         table_number_to_sequence_number = json.load(fj)
 
     print("Loading geographic file which provides mapping")
@@ -68,20 +69,32 @@ def main(table_to_publish, directory, geographic_unit="NY", reference_year="2013
         for file_type in file_types:
             if abridged:
                 abridged = "a_"
+                abridged_key = "abridged"
             else:
                 abridged = ""
+                abridged_key = "unabridged"
 
-            file_to_write = os.path.join(directory, abridged + file_type + reference_year + years_covered + geographic_unit.lower() + table_to_publish + ".csv")
+            base_version_table_name = abridged + file_type + reference_year + years_covered + geographic_unit.lower() + table_to_publish
+            file_to_write = os.path.join(directory, base_version_table_name + ".csv")
             file_to_read = os.path.join(directory, file_type + suffix_file)
 
             FIELD_LAYOUT = ["FILEDID", "FILETYPE", "STUSAB", "CHARITER", "SEQUENCE", "LOGRECNO"]
             field_dict = {}
 
-            publishing_data_dict = {"file_name": file_to_write, "file_type": file_type, "reference_year": reference_year,
-                                    "period_covered": years_covered, "state": geographic_unit,
-                                    "table_to_publish": table_to_publish}
+            publishing_data_dict = {"file_name": os.path.abspath(file_to_write), "file_type": file_type,
+                                    "reference_year": reference_year,
+                                    "period_covered": years_covered, "geographic_unit": geographic_unit,
+                                    "table_to_publish": table_to_publish,
+                                    "geographic_file": os.path.abspath(geographic_data_file),
+                                    "sequence_file": os.path.abspath(sequence_file_name),
+                                    "base_version_table_name": base_version_table_name
+                                    }
+            if file_type in variable_mapping_information_dict[table_to_publish]:
+                pass
+            else:
+                variable_mapping_information_dict[table_to_publish][file_type] = {}
 
-            variable_mapping_information_dict[table_to_publish][file_type] = publishing_data_dict
+            variable_mapping_information_dict[table_to_publish][file_type][abridged_key] = publishing_data_dict
 
             for i in range(len(FIELD_LAYOUT)):
                 field_dict[FIELD_LAYOUT[i]] = i
@@ -164,4 +177,6 @@ if __name__ == "__main__":
     acs_fields = config.acs_fields_to_export
     for acs_field in acs_fields:
         main(acs_field, config.geography_directory, geographic_unit=config.geographic_unit,
-             reference_year=config.reference_year, years_covered=config.years_covered)
+             reference_year=config.reference_year, years_covered=config.years_covered, abridged=False)
+        main(acs_field, config.geography_directory, geographic_unit=config.geographic_unit,
+             reference_year=config.reference_year, years_covered=config.years_covered, abridged=True)
