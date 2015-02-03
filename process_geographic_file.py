@@ -23,7 +23,7 @@ def main(path_to_geographic_file):
             slim_row_dict = {}
             for key in row_dict:
                 if len(row_dict[key]):
-                    slim_row_dict[key] = row_dict[key]
+                    slim_row_dict[key] = row_dict[key].decode("utf8", errors="replace")
 
             logical_record_dict[logical_record_id] = slim_row_dict
 
