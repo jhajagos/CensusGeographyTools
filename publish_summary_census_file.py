@@ -111,10 +111,17 @@ def main(table_to_publish, directory, geographic_unit="NY", reference_year="2013
                         if abridged:
                             cwr.writerow(["geoid", "table_id", "relative_position", "value"])
                         else:
-                            cwr.writerow(["goeid", "geo_name", "table_id", "table_name", "subject area",
+                            cwr.writerow(["goeid", "geo_name", "table_id", "table_name", "subject_area",
                                           "relative_position", "context_path", "file_type", "field_name", "value"])
 
+                        i = 0
                         for row in cr:
+                            if i == 0:
+                                publishing_data_dict["table_name"] = table_data["table name"]
+                                publishing_data_dict["subject_area"] = table_data["subject area"]
+                                publishing_data_dict["geographic_unit"] = geographic_unit
+                            i += 1
+
                             logical_record = row[field_dict["LOGRECNO"]]
                             if logical_record in geographic_data:
                                 geographic = geographic_data[logical_record]
