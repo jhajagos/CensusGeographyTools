@@ -13,6 +13,8 @@ reference_year = "2013"
 years_covered = "5"
 geographic_unit = "NY"
 
+schema = "acs_summary"
+
 # No geographic limitations
 acs_fields_to_export = ["B00001",
 "B00002",
