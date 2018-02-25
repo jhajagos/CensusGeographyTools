@@ -121,7 +121,7 @@ def main(table_to_publish, directory, geographic_unit="NY", reference_year="2013
                         if abridged:
                             cwr.writerow(["geoid", "table_id", "relative_position", "value"])
                         else:
-                            cwr.writerow(["goeid", "geo_name", "table_id", "table_name", "subject_area",
+                            cwr.writerow(["geoid", "geo_name", "table_id", "table_name", "subject_area",
                                           "relative_position", "context_path", "file_type", "field_name", "value"])
 
                         i = 0
