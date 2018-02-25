@@ -6,7 +6,6 @@ __author__ = 'janos'
     accessible.
 """
 
-
 import sys
 import json
 import os
@@ -14,6 +13,7 @@ try:
     import config
 except ImportError:
     import config_example as config
+
 
 def main(acs_json_file, schema=config.schema, abridged=False):
     if abridged:
@@ -53,7 +53,6 @@ def main(acs_json_file, schema=config.schema, abridged=False):
             sql_script += "insert into %s.exported_acs_tables \n   (" % schema
             sql_script += "table_id, table_name, file_type, reference_year, period_covered, base_version_table_name, geographic_unit, created_on)"
             sql_script += "\n   values ('%(table_id)s','%(table_name_escaped)s','%(file_type)s', '%(reference_year)s', '%(period_covered)s', '%(base_version_table_name)s', '%(geographic_unit)s', now());\n\n" % table_info
-
 
             header_text = "geoid	geo_name	table_id	table_name	subject_area	relative_position	context_path	file_type	field_name	str_value"
 
@@ -97,14 +96,10 @@ def main(acs_json_file, schema=config.schema, abridged=False):
 
         if i % 100 == 0:
             print("Processed %s tables" % i)
-            # print(sql_script)
-            # with open(os.path.join(base_directory, schema + "_load.sql"), "w") as fw:
-            #     fw.write(sql_script)
-            #
-            # exit()
 
     with open(os.path.join(base_directory, schema + "_load.sql"), "w") as fw:
         fw.write(sql_script)
+
 
 if __name__ == "__main__":
 
@@ -115,5 +110,4 @@ if __name__ == "__main__":
             main("./test/acs_files_generated.json")
         else:
             main(sys.argv[1])
-
 

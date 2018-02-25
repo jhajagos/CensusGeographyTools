@@ -34,12 +34,21 @@ ACSSF,B01002B,3,3, ,, ,Female,
 import json
 import csv
 import re
-import os
+import sys
 
 
-def main():
+def open_csv_file(file_name, mode="w"):
+
+    ver_info = sys.version_info[0]
+    if ver_info == 2:
+        return open(file_name, mode=mode + "b")
+    else:
+        return open(file_name, newline="", mode=mode)
+
+
+def main(sequence_number_to_csv_file_name):
     """
-    Parse the CSV file whcih lists the structure and transform into a JSON representative
+    Parse the CSV file which lists the structure and transform into a JSON representative
 
     Parser States:
         Header
@@ -51,9 +60,23 @@ def main():
         New Measure
     """
 
+    # TODO: Context mapping is wrong, see B25033 -- Should just be Total
+    """
+    {
+                "context path": [
+                    "Total",
+                    "Owner occupied"
+                ],
+                "field name": "Renter occupied",
+                "relative position": 8,
+                "row": 21600,
+                "table position": 244
+            },
+    """
+
     table_sequence_mappings = {}
 
-    with open("./support_files/Sequence_Number_and_Table_Number_Lookup_2013.csv", "rb") as fc:
+    with open_csv_file(sequence_number_to_csv_file_name, "r") as fc:
         csv_reader = csv.reader(fc)
         state = "Header"
         field_position_mappings = {}
@@ -73,7 +96,10 @@ def main():
             else:
                 row_dict = {}
                 for key in field_position_mappings:
-                    row_dict[key] = row[field_position_mappings[key]].decode('utf8', errors="replace")
+                    if sys.version_info[0] == 2:
+                        row_dict[key] = row[field_position_mappings[key]].decode('utf8', errors="replace")
+                    else:
+                        row_dict[key] = str(row[field_position_mappings[key]])
 
                 if state == "New Table":
                     if i == 1:
@@ -92,7 +118,6 @@ def main():
                             "universe": None,
                             "fields": []
                         }
-
 
                     context_path = []
                     state = "Universe Defined"
@@ -160,5 +185,12 @@ def main():
     with open("./support_files/table_number_to_sequence_number.json", "w") as fw:
         json.dump(table_sequence_mappings, fw,  sort_keys=True, indent=4, separators=(',', ': '))
 
+
 if __name__ == "__main__":
-    main()
+
+    try:
+        import config
+    except ImportError:
+        import config_example as config
+
+    main(config.sequence_number_table_csv_file)

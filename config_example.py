@@ -15,6 +15,8 @@ geographic_unit = "NY"
 
 schema = "acs_summary"
 
+sequence_number_table_csv_file = "./support_files/ACS_5yr_Seq_Table_Number_Lookup.csv"
+
 # No geographic limitations
 acs_fields_to_export = ["B00001",
                         "B00002",
@@ -386,6 +388,7 @@ acs_fields_to_export = ["B00001",
                         "C24010I",
                         "C24020",
                         "C24030",
-                        "C25095"]
+                        "C25095"
+                        ]
 #  For testing purposes
 #acs_fields_to_export = ["B00001", "B00002", "B01001", "B01002","B16002"]

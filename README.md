@@ -25,4 +25,18 @@ https://www.census.gov/programs-surveys/acs/technical-documentation/summary-file
 wget https://www2.census.gov/programs-surveys/acs/summary_file/2016/documentation/user_tools/ACS_5yr_Seq_Table_Number_Lookup.xls
 ```
 
-Save this file as CSV file.
+Save this file as CSV file. Make a non-version controlled version of "config_example.py" called "config.py"
+
+Edit "config.py" set the variable `sequence_number_table_csv_file` in the file equal to "../support_filesACS_5yr_Seq_Table_Number_Lookup.csv".
+
+Run the script:
+
+```bash
+python parse_sequence_table_field_mapping_file.py
+```
+
+Set in config.py the data directory where your downloaded files are.
+
+```bash B25033
+python
+```

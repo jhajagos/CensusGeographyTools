@@ -168,7 +168,7 @@ def main(table_to_publish, directory, geographic_unit="NY", reference_year="2013
                                     absolute_position = field["table position"] - 1
                                     try:
                                         value = row[absolute_position]
-                                    except IndexError:
+                                    except(IndexError):
                                         print(table_data)
                                         print(row, absolute_position, relative_position, field["table position"])
                                         raise
