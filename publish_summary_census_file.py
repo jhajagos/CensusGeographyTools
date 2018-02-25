@@ -3,10 +3,20 @@ import json
 import csv
 import glob
 import os
+import sys
 
 """
 Export an ACS variable identified "B16002" across all geographies that are identified.
 """
+
+
+def open_csv_file(file_name, mode="w"):
+
+    ver_info = sys.version_info[0]
+    if ver_info == 2:
+        return open(file_name, mode=mode + "b")
+    else:
+        return open(file_name, newline="", mode=mode)
 
 
 def pad_number(number, length):
@@ -102,10 +112,10 @@ def main(table_to_publish, directory, geographic_unit="NY", reference_year="2013
             if os.path.exists(file_to_read):
                 print("Census file exists")
 
-                with open(file_to_read, "r") as f:
+                with open_csv_file(file_to_read, "r") as f:
                     cr = csv.reader(f)
                     print("Writing CSV file '%s'" % file_to_write)
-                    with open(file_to_write, "wb") as fw:
+                    with open_csv_file(file_to_write, "w") as fw:
                         cwr = csv.writer(fw)
 
                         if abridged:
@@ -173,6 +183,7 @@ def main(table_to_publish, directory, geographic_unit="NY", reference_year="2013
 
     with open(variable_mapping_information_file, "w") as fw:
         json.dump(variable_mapping_information_dict, fw, sort_keys=True, indent=4, separators=(',', ': '))
+
 
 if __name__ == "__main__":
 
