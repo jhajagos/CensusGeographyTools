@@ -152,17 +152,27 @@ def main(sequence_number_to_csv_file_name):
                         elif len(row_dict["Line Number"].strip()):
                             field_name = row_dict["Table Title"]
                             modified_field_name = field_name
+
                             if modified_field_name[-1] == ":":
                                 modified_field_name = modified_field_name[:-1]
                             position = row_dict["Line Number"]
 
                             if "." not in position:
+
+                                if field_name[-1] == ":":
+                                    if len(context_path) > 1:
+                                        context_path_to_write = list(context_path)
+                                        context_path_to_write.pop()
+                                    #context_path_to_write += [field_name[:-1]]
+                                else:
+                                    context_path_to_write = list(context_path)
+
                                 table_sequence_mappings[table_id]["fields"] += [
-                                    {"row": i, "context path": list(context_path), "relative position": int(position),
+                                    {"row": i, "context path": list(context_path_to_write), "relative position": int(position),
                                      "field name": modified_field_name,
                                      "table position": int(start_position) + int(position) - 1}]
                             else:
-                                pass # Record medians
+                                pass  # Record medians
 
                             if field_name[-1] == ":":
                                 if len(context_path) > 1:
