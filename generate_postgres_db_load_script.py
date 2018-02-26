@@ -56,12 +56,13 @@ def main(acs_json_file, schema=config.schema, abridged=False):
 
             header_text = "geoid	geo_name	table_id	table_name	subject_area	relative_position	context_path	file_type	field_name	str_value"
 
-            data_types_map = {'geoid': "varchar(63)", 'geo_name': "varchar(255)", 'table_id': "varchar(16)", 'table_name': "varchar(255)",
-                              'subject_area': "varchar(255)",
-                              'relative_position': "int2", 'context_path': "varchar(255)",
-                              'file_type': "varchar(16)", 'field_name': "varchar(255)",
-                              'str_value': "varchar(255)",
-                              'value_txt': "varchar(255)", 'value_int': "integer", 'value_float': "float"}
+            data_types_map = {"geoid": "varchar(63)", "geo_name": "varchar(255)", "table_id": "varchar(16)",
+                              "table_name": "varchar(255)",
+                              "subject_area": "varchar(255)",
+                              "relative_position": "int2", "context_path": "varchar(255)",
+                              "file_type": "varchar(16)", "field_name": "varchar(255)",
+                              "str_value": "varchar(255)",
+                              "value_txt": "varchar(255)", "value_int": "integer", "value_float": "float"}
 
             header = header_text.split('\t')
 
