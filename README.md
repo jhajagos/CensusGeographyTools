@@ -37,6 +37,18 @@ python parse_sequence_table_field_mapping_file.py
 
 Set in config.py the data directory where your downloaded files are.
 
-```bash B25033
-python
+
+```bash
+python process_geographic_file.py
 ```
+
+
+```bash
+python publish_summary_census_file.py
+```
+
+```bash
+ python generate_postgres_db_load_script.py ~/data/acs/newyork_bg_tract/acs_files_generated.json
+```
+
+where the acs_files_generated.json points to the directory to load.

@@ -15,7 +15,7 @@ except ImportError:
     import config_example as config
 
 
-def main(acs_json_file, schema=config.schema, abridged=False):
+def main(acs_json_file, schema=config.schema, abridged=False, load_estimates_only=True):
     if abridged:
         abridged_status = "abridged"
     else:
@@ -43,7 +43,12 @@ def main(acs_json_file, schema=config.schema, abridged=False):
         estimate_table_info = acs_dict[table]["e"][abridged_status]
         margin_of_error_table_info = acs_dict[table]["m"][abridged_status]
 
-        for table_info in [estimate_table_info, margin_of_error_table_info]:
+        if load_estimates_only:
+            tables_to_load = [estimate_table_info]
+        else:
+            tables_to_load = [estimate_table_info, margin_of_error_table_info]
+
+        for table_info in tables_to_load:
 
             table_info["table_id"] = table
 
