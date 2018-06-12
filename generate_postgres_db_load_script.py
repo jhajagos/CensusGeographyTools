@@ -1,4 +1,4 @@
-__author__ = 'janos'
+__author__ = "janos"
 
 """
     This script creates a PostGreSQL database load script. The assumption is that the files

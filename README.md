@@ -16,6 +16,12 @@ wget https://www2.census.gov/programs-surveys/acs/summary_file/2016/data/5_year_
 wget https://www2.census.gov/programs-surveys/acs/summary_file/2016/data/5_year_by_state/NewYork_Tracts_Block_Groups_Only.zip
 ```
 
+If you want ZCTA5 (Zip Code Tabulation Area 5 digits) then you need the
+
+```bash
+wget https://www2.census.gov/programs-surveys/acs/summary_file/2016/data/5_year_by_state/	UnitedStates_All_Geographies_Not_Tracts_Block_Groups.zip
+```
+
 
 Get correct version of the file at:
 

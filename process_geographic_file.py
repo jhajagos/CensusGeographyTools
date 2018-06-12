@@ -17,7 +17,7 @@ def open_csv_file(file_name, mode="w"):
 
 def main(path_to_geographic_file):
 
-    with open_csv_file("./support_files/2012_SFGeoFileTemplate.csv", "r") as f:
+    with open_csv_file("./support_files/2012_SFGeoFileTemplate.csv", "r") as f: # This is just a template for the header
         cvr = csv.reader(f)
 
         if sys.version_info[0] == 2:
