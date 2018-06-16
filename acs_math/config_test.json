@@ -1,0 +1,4 @@
+{
+  "connection_uri": "sqlite:///acs_load.db3",
+  "schema": null
+}

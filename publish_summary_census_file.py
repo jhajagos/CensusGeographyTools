@@ -179,7 +179,7 @@ def main(table_to_publish, directory, geographic_unit="NY", reference_year="2013
             else:
                 print("File '%s' does not exist" % file_to_read)
     else:
-        print("Table '%s' not in mapping file" % table_to_publish)
+        print("Table '%s' is not in the mapping file" % table_to_publish)
 
     with open(variable_mapping_information_file, "w") as fw:
         json.dump(variable_mapping_information_dict, fw, sort_keys=True, indent=4, separators=(',', ': '))
