@@ -48,7 +48,6 @@ class MyTestCase(unittest.TestCase):
         self.variable_factory = av.ACSVariableFactory(self.acs_scope, self.geo_restriction)
 
 
-
     def test_setup(self):
 
         self.assertEqual("e20165us", self.acs_scope.table_prefix)
@@ -57,7 +56,13 @@ class MyTestCase(unittest.TestCase):
 
         total = self.variable_factory.new("B01001", 1)
         total_male = self.variable_factory.new("B01001", 2)
-        total_female = self.variable_factory.new("B01001", 26)
+        #total_female = self.variable_factory.new("B01001", 26)
+
+        fraction_male = total_male / total
+
+        self.assertIsNotNone(fraction_male)
+
+        print(fraction_male.series.sort_values(ascending=False))
 
 
 if __name__ == '__main__':
