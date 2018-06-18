@@ -56,13 +56,25 @@ class MyTestCase(unittest.TestCase):
 
         total = self.variable_factory.new("B01001", 1)
         total_male = self.variable_factory.new("B01001", 2)
-        #total_female = self.variable_factory.new("B01001", 26)
+        total_female = self.variable_factory.new("B01001", 26)
 
         fraction_male = total_male / total
 
         self.assertIsNotNone(fraction_male)
 
-        print(fraction_male.series.sort_values(ascending=False))
+        one_minus_fraction_male = av.ACSConstant(1) - fraction_male
+
+        fraction_female = total_female / total
+
+
+        export = av.ACSExport([("total population", total),
+                      ("total_male", total_male),
+                      ("fraction_male", fraction_male),
+                      ("total_female", total_female),
+                      ("fraction_female", fraction_female)
+                      ])
+
+        export.df.to_csv("test.csv")
 
 
 if __name__ == '__main__':

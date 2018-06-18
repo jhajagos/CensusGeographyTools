@@ -34,6 +34,34 @@ class ACSVariable(object):
     def __truediv__(self, other):
         return ACSVariableDerived(self.series / other.series)
 
+    def __rtruediv__(self, other):
+        return ACSVariableDerived(self.series / other)
+
+    def __add__(self, other):
+        return ACSVariableDerived(self.series + other.series)
+
+    def __radd__(self, other):
+        return ACSVariableDerived(self.series / other)
+
+    def __sub__(self, other):
+        return ACSVariableDerived(self.series - other.series)
+
+    def __rsub__(self, other):
+        return ACSVariableDerived(self.series + other)
+
+    def __mul__(self, other):
+        return ACSVariableDerived(self.series * other.series)
+
+    def __rmul__(self, other):
+        return ACSVariableDerived(self.series * other)
+
+
+class ACSConstant(ACSVariable):
+
+    def __init__(self, constant):
+        self.constant = constant
+        self.series = constant
+
 
 class ACSVariableData(ACSVariable):
 
@@ -102,5 +130,15 @@ class ACSVariableFactory(object):
 
 class ACSExport(object):
 
-    def __init__(self, pairs_with_export):
-        pass
+    def __init__(self, pairs_with_df):
+        self.pairs_with_df = pairs_with_df
+        self._create_data_frame()
+
+    def _create_data_frame(self):
+        dfs = [d[1].series for d in self.pairs_with_df]
+        dfs_names = [d[0] for d in self.pairs_with_df]
+
+        self.df = pd.concat(dfs, axis=1)
+        self.df.columns = dfs_names
+
+        print(self.df)
