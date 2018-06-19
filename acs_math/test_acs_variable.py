@@ -33,6 +33,7 @@ class MyTestCase(unittest.TestCase):
             "11961"
         ]
 
+        self.geo_restriction = av.GeographicRestriction("north_central", self.zcta5)
         with open("./config_test.json") as f:
             config = json.load(f)
 
@@ -43,10 +44,6 @@ class MyTestCase(unittest.TestCase):
 
         self.acs_scope = av.ACSScope(connection, "e", 2016, 5, "US")
 
-        self.geo_restriction = av.GeographicRestriction("north_central", self.zcta5)
-
-        self.variable_factory = av.ACSVariableFactory(self.acs_scope, self.geo_restriction)
-
 
     def test_setup(self):
 
@@ -54,9 +51,11 @@ class MyTestCase(unittest.TestCase):
 
     def test_variables(self):
 
-        total = self.variable_factory.new("B01001", 1)
-        total_male = self.variable_factory.new("B01001", 2)
-        total_female = self.variable_factory.new("B01001", 26)
+        variable_factory = av.ACSVariableFactory(self.acs_scope, None)
+
+        total = variable_factory.new("B01001", 1)
+        total_male = variable_factory.new("B01001", 2)
+        total_female = variable_factory.new("B01001", 26)
 
         fraction_male = total_male / total
 
@@ -66,7 +65,6 @@ class MyTestCase(unittest.TestCase):
 
         fraction_female = total_female / total
 
-
         export = av.ACSExport([("total population", total),
                       ("total_male", total_male),
                       ("fraction_male", fraction_male),
@@ -75,6 +73,13 @@ class MyTestCase(unittest.TestCase):
                       ])
 
         export.df.to_csv("test.csv")
+
+    def test_variables_with_geo_restriction(self):
+        variable_factory = av.ACSVariableFactory(self.acs_scope, self.geo_restriction, geo_restriction_refresh = True)
+        total = variable_factory.new("B01001", 1)
+        total_male = variable_factory.new("B01001", 2)
+
+        self.assertEqual(22, len(total_male.series))
 
 
 if __name__ == '__main__':
