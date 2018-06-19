@@ -86,7 +86,7 @@ class ACSVariable(object):
         return ACSVariableDerived(self.series - other.series)
 
     def __rsub__(self, other):
-        return ACSVariableDerived(self.series + other)
+        return ACSVariableDerived(self.series - other)
 
     def __mul__(self, other):
         return ACSVariableDerived(self.series * other.series)

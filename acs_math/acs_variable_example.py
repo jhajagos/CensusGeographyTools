@@ -199,6 +199,58 @@ def main(connection_uri, schema, output_directory):
 
     fraction_65_plus = sixty_five_plus / total
 
+    total_rentals = variable_factory.new("B25070", 1)
+    total_rentals_not_computed = variable_factory.new("B25070", 11)
+
+    perc_gross_35_to_39 = variable_factory.new("B25070", 8)
+    perc_gross_40_to_49 = variable_factory.new("B25070", 9)
+    perc_gross_50_plus = variable_factory.new("B25070", 10)
+
+    perc_gross_35_plus = perc_gross_35_to_39 + perc_gross_40_to_49 + perc_gross_50_plus
+    total_rentals_computed = total_rentals - total_rentals_not_computed
+
+    fraction_more_than_35 = perc_gross_35_plus / total_rentals_computed
+
+    """
+   1 Total:	213,649,147	+/-15,761
+2 Less than high school graduate	27,818,380	+/-122,561
+3 High school graduate (includes equivalency)	58,820,411	+/-182,369
+4 Some college or associate's degree	62,242,569	+/-55,692
+5 Bachelor's degree	40,189,920	+/-142,140
+6 Graduate or professional degree	24,577,867	+/-151,18
+    """
+
+    total_25_plus = variable_factory.new("B06009", 1)
+    bachelor_degree = variable_factory.new("B06009", 5)
+    graduate_prof_degree = variable_factory.new("B06009",6)
+
+    bachelor_degree_or_higher = bachelor_degree + graduate_prof_degree
+
+    fraction_bachelor_degree_or_higher = bachelor_degree_or_higher / total_25_plus
+
+    """
+1    Total:	195,226,024	+/-10,224
+2 In the labor force:	149,849,229	+/-109,791
+3 Employed:	138,920,971	+/-125,249
+4 With a disability	6,993,203	+/-16,648
+5 No disability	131,927,768	+/-123,746
+6 Unemployed:	10,928,258	+/-29,732
+7 With a disability	1,285,631	+/-9,361
+8 No disability	9,642,627	+/-29,860
+9 Not in labor force:	45,376,795	+/-113,164
+10 With a disability	11,909,423	+/-46,803
+11 No disability	33,467,372	+/-76,139
+    """
+
+    """
+    Total:	310,629,645	+/-11,780
+Below 100 percent of the poverty level	46,932,225	+/-284,072
+100 to 149 percent of the poverty level	29,044,888	+/-134,530
+At or above 150 percent of the poverty level	234,652,532	+/-408,43
+    """
+
+
+
     export_obj = av.ACSExport([("total_population", total),
                                ("total_male", total_male),
                                ("fraction_male", fraction_male),
@@ -222,7 +274,13 @@ def main(connection_uri, schema, output_directory):
                                ("under_18_yr", under_18_yr),
                                ("fraction_under_18_yr", fraction_under_18_yr),
                                ("65_plus", sixty_five_plus),
-                               ("fraction_65_plus", fraction_65_plus)
+                               ("fraction_65_plus", fraction_65_plus),
+                               ("total_rental_used_in_calc", total_rentals_computed),
+                               ("35_plus_rent_gross", perc_gross_35_plus),
+                               ("fraction_more_than_35_gross_rent", fraction_more_than_35),
+                               ("total_25_plus", total_25_plus),
+                               ("bachelor_and_higher", bachelor_degree_or_higher),
+                               ("fraction_bachelor_and_higher", fraction_bachelor_degree_or_higher)
                                ])
 
     export_obj.df["zip5"] = export_obj.df["geo_field"].apply(lambda x: x[6:])
@@ -241,3 +299,73 @@ if __name__ == "__main__":
         config = json.load(f)
 
     main(config["connection_uri"], config["schema"], config["output_directory"])
+
+
+    """
+    Total:	313,576,137	+/-10,365
+Under 18 years:	73,475,378	+/-8,041
+With one type of health insurance coverage:	65,109,722	+/-25,755
+With employer-based health insurance only	34,410,287	+/-141,052
+With direct-purchase health insurance only	3,852,219	+/-26,651
+With Medicare coverage only	202,751	+/-6,454
+With Medicaid/means-tested public coverage only	25,400,518	+/-165,975
+With TRICARE/military health coverage only	1,217,945	+/-10,014
+With VA Health Care only	26,002	+/-1,829
+With two or more types of health insurance coverage:	4,032,588	+/-30,220
+With employer-based and direct-purchase coverage	737,085	+/-11,238
+With employer-based and Medicare coverage	25,752	+/-1,612
+With Medicare and Medicaid/means-tested public coverage	167,565	+/-4,321
+Other private only combinations	355,361	+/-5,796
+Other public only combinations	13,168	+/-1,012
+Other coverage combinations	2,733,657	+/-21,451
+No health insurance coverage	4,333,068	+/-32,505
+18 to 34 years:	72,771,471	+/-13,992
+With one type of health insurance coverage:	54,202,794	+/-70,603
+With employer-based health insurance only	37,925,831	+/-76,330
+With direct-purchase health insurance only	5,787,275	+/-29,139
+With Medicare coverage only	229,426	+/-4,352
+With Medicaid/means-tested public coverage only	9,191,150	+/-36,524
+With TRICARE/military health coverage only	864,298	+/-7,638
+With VA Health Care only	204,814	+/-3,670
+With two or more types of health insurance coverage:	3,675,873	+/-30,027
+With employer-based and direct-purchase coverage	1,224,407	+/-14,066
+With employer-based and Medicare coverage	48,835	+/-1,499
+With Medicare and Medicaid/means-tested public coverage	376,465	+/-4,964
+Other private only combinations	307,982	+/-5,123
+Other public only combinations	38,731	+/-1,547
+Other coverage combinations	1,679,453	+/-17,420
+No health insurance coverage	14,892,804	+/-102,653
+35 to 64 years:	122,454,553	+/-11,795
+With one type of health insurance coverage:	94,934,763	+/-126,322
+With employer-based health insurance only	71,416,584	+/-189,264
+With direct-purchase health insurance only	9,715,444	+/-23,649
+With Medicare coverage only	2,110,731	+/-19,432
+With Medicaid/means-tested public coverage only	9,828,956	+/-63,463
+With TRICARE/military health coverage only	1,153,106	+/-9,541
+With VA Health Care only	709,942	+/-7,820
+With two or more types of health insurance coverage:	10,452,354	+/-45,356
+With employer-based and direct-purchase coverage	2,445,849	+/-28,185
+With employer-based and Medicare coverage	687,338	+/-6,606
+With direct-purchase and Medicare coverage	376,799	+/-4,727
+With Medicare and Medicaid/means-tested public coverage	2,372,431	+/-17,871
+Other private only combinations	599,045	+/-7,686
+Other public only combinations	303,901	+/-3,811
+Other coverage combinations	3,666,991	+/-27,096
+No health insurance coverage	17,067,436	+/-156,091
+65 years and over:	44,874,735	+/-6,103
+With one type of health insurance coverage:	13,064,961	+/-37,633
+With employer-based health insurance only	1,028,312	+/-7,954
+With direct-purchase health insurance only	175,021	+/-3,188
+With Medicare coverage only	11,818,560	+/-32,937
+With TRICARE/military health coverage only	13,306	+/-927
+With VA Health Care only	29,762	+/-1,226
+With two or more types of health insurance coverage:	31,402,836	+/-44,454
+With employer-based and direct-purchase coverage	39,755	+/-1,519
+With employer-based and Medicare coverage	8,997,503	+/-19,463
+With direct-purchase and Medicare coverage	8,840,780	+/-17,703
+With Medicare and Medicaid/means-tested public coverage	3,798,418	+/-22,750
+Other private only combinations	6,579	+/-542
+Other public only combinations	1,039,999	+/-6,772
+Other coverage combinations	8,679,802	+/-49,029
+No health insurance coverage	406,938	+/-7,734
+    """
