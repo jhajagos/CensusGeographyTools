@@ -5,12 +5,12 @@ import sqlalchemy as sa
 import pandas as pd
 
 
-def main(connection_uri, schema, output_directory):
+def main(connection_uri, output_directory, schema_dict):
 
     engine = sa.create_engine(connection_uri)
     connection = engine.connect()
 
-    acs_scope = av.ACSScope(connection, "e", 2016, 5, "us", schema)
+    acs_scope_us = av.ACSScope(connection, "e", 2016, 5, "us", schema_dict["acs_us"])
 
     suffolk_county_zips = [
         'ZCTA5 11720',
@@ -129,9 +129,95 @@ def main(connection_uri, schema, output_directory):
         'ZCTA5 11971',
     ]
 
-    geo_restriction = av.GeographicRestriction("suffolk_county_zips", suffolk_county_zips)
+    zcta5_geo_restriction = av.GeographicRestriction("suffolk_county_zips", suffolk_county_zips)
+    zcta5_export = generate_acs_summary(acs_scope_us, zcta5_geo_restriction, "geo_name")
 
-    variable_factory = av.ACSVariableFactory(acs_scope, geo_restriction)
+    zcta5_export.df["zip5"] = zcta5_export.df["geo_field"].apply(lambda x: x[6:])
+
+    geo_categories_df = pd.read_csv(os.path.join(output_directory, "geo_categories.csv"), dtype={"zip5": str})
+
+    export_df = pd.merge(geo_categories_df, zcta5_export.df, how="right", on="zip5")
+    zcta5_export.write_to_csv(os.path.join(output_directory, "suffolk_county_zips_census_primary.csv"))
+
+    export_df.to_csv(os.path.join(output_directory, "suffolk_county_zips_census_annotated.csv"), index=False)
+
+    acs_scope_ny = av.ACSScope(connection, "e", 2016, 5, "ny", schema_dict["acs_ny"])
+
+    ny_geonames =  [
+        'New York',
+        'Erie County, New York',
+        'Essex County, New York',
+        'Franklin County, New York',
+        'Fulton County, New York',
+        'Genesee County, New York',
+        'Greene County, New York',
+        'Hamilton County, New York',
+        'Herkimer County, New York',
+        'Albany County, New York',
+        'Allegany County, New York',
+        'Bronx County, New York',
+        'Broome County, New York',
+        'Cattaraugus County, New York',
+        'Cayuga County, New York',
+        'Chautauqua County, New York',
+        'Chemung County, New York',
+        'Chenango County, New York',
+        'Clinton County, New York',
+        'Columbia County, New York',
+        'Cortland County, New York',
+        'Delaware County, New York',
+        'Dutchess County, New York',
+        'Jefferson County, New York',
+        'Kings County, New York',
+        'Lewis County, New York',
+        'Livingston County, New York',
+        'Madison County, New York',
+        'Monroe County, New York',
+        'Montgomery County, New York',
+        'Nassau County, New York',
+        'New York County, New York',
+        'Niagara County, New York',
+        'Oneida County, New York',
+        'Onondaga County, New York',
+        'Ontario County, New York',
+        'Orange County, New York',
+        'Orleans County, New York',
+        'Oswego County, New York',
+        'Otsego County, New York',
+        'Putnam County, New York',
+        'Queens County, New York',
+        'Rensselaer County, New York',
+        'Richmond County, New York',
+        'Rockland County, New York',
+        'St. Lawrence County, New York',
+        'Saratoga County, New York',
+        'Schenectady County, New York',
+        'Schoharie County, New York',
+        'Schuyler County, New York',
+        'Seneca County, New York',
+        'Steuben County, New York',
+        'Suffolk County, New York',
+        'Sullivan County, New York',
+        'Tioga County, New York',
+        'Tompkins County, New York',
+        'Ulster County, New York',
+        'Warren County, New York',
+        'Washington County, New York',
+        'Wayne County, New York',
+        'Westchester County, New York',
+        'Wyoming County, New York',
+        'Yates County, New York'
+    ]
+
+    ny_geo_restriction = av.GeographicRestriction("ny_geonames", ny_geonames)
+    ny_export = generate_acs_summary(acs_scope_ny, ny_geo_restriction, "geo_name")
+
+    ny_export.write_to_csv(os.path.join(output_directory, "new_york_census_primary.csv"))
+
+
+def generate_acs_summary(acs_scope, geographic_restriction, geo_field):
+
+    variable_factory = av.ACSVariableFactory(acs_scope, geographic_restriction, geo_field)
     total = variable_factory.new("B01001", 1)
     total_male = variable_factory.new("B01001", 2)
     fraction_male = total_male / total
@@ -154,32 +240,10 @@ def main(connection_uri, schema, output_directory):
     fraction_african_american = african_american / total
     fraction_asian = asian / total
     fraction_other_race = other_race / total
-    fraction_multi_racial =  multi_racial / total
-    #fraction_non_white = av.ACSConstant(1) - fraction_white
+    fraction_multi_racial = multi_racial / total
 
     hispanic = variable_factory.new("B03003", 3)
     fraction_hispanic = hispanic / total
-
-    """
-    B16006
-1    Total:	50,068,537	+/-1,924
-2 Speak only English	13,361,272	+/-94,026
-3 Speak Spanish:	36,477,788	+/-96,281
-4 Speak English "very well"	20,717,430	+/-58,832
-5 Speak English "well"	6,467,544	+/-24,068
-6 Speak English "not well"	6,020,299	+/-37,079
-7 Speak English "not at all"	3,272,515	+/-31,732
-8 Speak other language	229,477	+/-5,404
-    """
-
-    hispanic_5_plus = variable_factory.new("B16006", 1)
-    hispanic_speak_spanish_5_plus = variable_factory.new("B16006", 3)
-    hispanic_speak_spanish_english_not_well_5_plus = variable_factory.new("B16006", 6)
-    hispanic_speak_spanish_english_not_all_5_plus = variable_factory.new("B16006", 7)
-
-    fraction_hispanic_speak_spanish_5_plus = hispanic_speak_spanish_5_plus / hispanic_5_plus
-    hispanic_speak_english_not_well_not_all = hispanic_speak_spanish_english_not_well_5_plus + hispanic_speak_spanish_english_not_all_5_plus
-    fraction_hispanic_speak_english_not_well_not_all = hispanic_speak_english_not_well_not_all / hispanic_5_plus
 
     male_under_5_yr = variable_factory.new("B01001", 3)
     male_5_to_9_yr = variable_factory.new("B01001", 4)
@@ -277,8 +341,8 @@ Below 100 percent of the poverty level	46,932,225	+/-284,072
 At or above 150 percent of the poverty level	234,652,532	+/-408,43
     """
 
-    below_100_fpl = acs_scope.new("B06012", 2)
-    between_100_150_fpl = acs_scope.new("B06012", 3)
+    below_100_fpl = variable_factory.new("B06012", 2)
+    between_100_150_fpl = variable_factory.new("B06012", 3)
 
     below_150_fpl = below_100_fpl + between_100_150_fpl
 
@@ -305,26 +369,49 @@ At or above 150 percent of the poverty level	234,652,532	+/-408,43
 66	Total|With two or more types of health insurance coverage	No health insurance coverage	0	0	11776				1	1
     """
 
-    medicare_under_18 = variable_factory.new("B27010", 6)
+    """
+    12	With employer-based and Medicare coverage	0
+28	With employer-based and Medicare coverage	0
+44	With employer-based and Medicare coverage	122
+45	With direct-purchase and Medicare coverage	67
+60	With employer-based and Medicare coverage	1311
+61	With direct-purchase and Medicare coverage	604
+
+    """
+
+    medicare_only_under_18 = variable_factory.new("B27010", 6)
     medicaid_under_18 = variable_factory.new("B27010", 7)
+    medicare_employee_under_18 = variable_factory.new("B27010", 7)
+
     dual_under_18 = variable_factory.new("B27010", 13)
     no_insurance_under_18 = variable_factory.new("B27010", 17)
 
     medicare_18_to_34 = variable_factory.new("B27010", 22)
     medicaid_18_to_34 = variable_factory.new("B27010", 23)
+    medicare_employee_18_to_34 = variable_factory.new("B27010", 28)
+
     dual_18_to_34 = variable_factory.new("B27010", 29)
     no_insurance_18_to_34 = variable_factory.new("B27010", 33)
 
-    medicare_35_to_64 = variable_factory.new("B27010", 38)
+    medicare_only_35_to_64 = variable_factory.new("B27010", 38)
     medicaid_35_to_64 = variable_factory.new("B27010", 39)
+    medicare_employee_35_to_64 = variable_factory.new("B27010", 45)
+
     dual_35_to_64 = variable_factory.new("B27010", 46)
     no_insurance_35_to_64 = variable_factory.new("B27010", 50)
 
-    medicare_65_plus = variable_factory.new("B27010", 55)
+    medicare_only_65_plus = variable_factory.new("B27010", 55)
+    medicare_employee_65_plus = variable_factory.new("B27010", 60)
+    medicare_direct_65_plus = variable_factory.new("B27010", 61)
     dual_65_plus = variable_factory.new("B27010", 62)
-    no_insurance_65_plus = variable_factory("B27010", 66)
+    no_insurance_65_plus = variable_factory.new("B27010", 66)
 
-    medicare = medicare_under_18 + medicare_18_to_34 + medicare_35_to_64 + medicare_65_plus
+    medicare_only = medicare_only_under_18 + medicare_18_to_34 + medicare_only_35_to_64 + medicare_only_65_plus
+    medicare_employee_direct = medicare_employee_under_18 + medicare_employee_18_to_34 + medicare_employee_35_to_64 \
+        + medicare_employee_65_plus + medicare_direct_65_plus
+
+    medicare = medicare_only + medicare_employee_direct
+
     medicaid = medicaid_under_18 + medicaid_18_to_34 + medicaid_35_to_64
     dual = dual_under_18 + dual_18_to_34 + dual_35_to_64 + dual_65_plus
     no_insurance = no_insurance_under_18 + no_insurance_18_to_34 + no_insurance_35_to_64 + no_insurance_65_plus
@@ -356,7 +443,51 @@ At or above 150 percent of the poverty level	234,652,532	+/-408,43
 45	Total|Speak other languages	Speak English "not at all"	0	11776	1
     """
 
-    export_obj = av.ACSExport([("total_population", total),
+    total_5_plus = variable_factory.new("B16005", 1)
+
+    native_born_speak_spanish_english_not_well = variable_factory.new("B16005", 7)
+    native_born_speak_spanish_english_not_all = variable_factory.new("B16005", 8)
+    native_born_speak_spanish_english_limited = native_born_speak_spanish_english_not_well + native_born_speak_spanish_english_not_all
+
+    native_born_speak_euro_english_not_well = variable_factory.new("B16005", 12)
+    native_born_speak_euro_english_not_all = variable_factory.new("B16005", 13)
+    native_born_speak_euro_english_limited = native_born_speak_euro_english_not_well + native_born_speak_euro_english_not_all
+
+    native_born_speak_asian_english_not_well = variable_factory.new("B16005", 17)
+    native_born_speak_asian_english_not_all = variable_factory.new("B16005", 18)
+    native_born_speak_asian_english_limited = native_born_speak_asian_english_not_well + native_born_speak_asian_english_not_all
+
+    native_born_speak_other_english_not_well = variable_factory.new("B16005", 22)
+    native_born_speak_other_english_not_all = variable_factory.new("B16005", 23)
+    native_born_speak_other_english_limited = native_born_speak_other_english_not_well + native_born_speak_other_english_not_all
+
+    native_born_speak_english_limited = native_born_speak_spanish_english_limited + native_born_speak_euro_english_limited \
+                                   + native_born_speak_asian_english_limited + native_born_speak_other_english_limited
+
+    foreign_born_speak_spanish_english_not_well = variable_factory.new("B16005", 28)
+    foreign_born_speak_spanish_english_not_all = variable_factory.new("B16005", 29)
+    foreign_born_speak_spanish_english_limited = foreign_born_speak_spanish_english_not_well + foreign_born_speak_spanish_english_not_all
+
+    foreign_born_speak_euro_english_not_well = variable_factory.new("B16005", 34)
+    foreign_born_speak_euro_english_not_all = variable_factory.new("B16005", 35)
+    foreign_born_speak_euro_english_limited = foreign_born_speak_euro_english_not_well + foreign_born_speak_euro_english_not_all
+
+    foreign_born_speak_asian_english_not_well = variable_factory.new("B16005", 39)
+    foreign_born_speak_asian_english_not_all = variable_factory.new("B16005", 40)
+    foreign_born_speak_asian_english_limited = foreign_born_speak_asian_english_not_well + foreign_born_speak_asian_english_not_all
+
+    foreign_born_speak_other_english_not_well = variable_factory.new("B16005", 44)
+    foreign_born_speak_other_english_not_all = variable_factory.new("B16005", 45)
+    foreign_born_speak_other_english_limited = foreign_born_speak_other_english_not_well + foreign_born_speak_other_english_not_all
+
+    foreign_born_speak_english_limited = foreign_born_speak_spanish_english_limited + foreign_born_speak_asian_english_limited \
+        + foreign_born_speak_euro_english_limited + foreign_born_speak_other_english_limited
+
+    speak_english_limited = native_born_speak_english_limited + foreign_born_speak_english_limited
+
+    fraction_speak_english_limited = speak_english_limited / total_5_plus
+
+    acs_export_obj = av.ACSExport([("total_population", total),
                                ("total_male", total_male),
                                ("fraction_male", fraction_male),
                                ("total_female", total_female),
@@ -376,10 +507,9 @@ At or above 150 percent of the poverty level	234,652,532	+/-408,43
                                ("multi_racial", fraction_multi_racial),
                                ("hispanic", hispanic),
                                ("fraction_hispanic", fraction_hispanic),
-                               ("hispanic_5_plus", hispanic_5_plus),
-                               ("hispanic_speak_spanish_5_plus", hispanic_speak_spanish_5_plus),
-                               ("hispanic_speak_english_not_well_not_all", hispanic_speak_english_not_well_not_all),
-                               ("fraction_hispanic_speak_english_not_well_not_all", fraction_hispanic_speak_english_not_well_not_all),
+                               ("total_5_plus", total_5_plus),
+                               ("speak_english_limited", speak_english_limited),
+                               ("fraction_speak_english_limited", fraction_speak_english_limited),
                                ("under_18_yr", under_18_yr),
                                ("fraction_under_18_yr", fraction_under_18_yr),
                                ("65_plus", sixty_five_plus),
@@ -409,14 +539,7 @@ At or above 150 percent of the poverty level	234,652,532	+/-408,43
                                ("fraction_no_insurance", fraction_no_insurance)
                             ])
 
-    export_obj.df["zip5"] = export_obj.df["geo_field"].apply(lambda x: x[6:])
-
-    geo_categories_df = pd.read_csv(os.path.join(output_directory, "geo_categories.csv"), dtype={"zip5": str})
-
-    export_df = pd.merge(geo_categories_df, export_obj.df, how="right", on="zip5")
-    export_obj.write_to_csv(os.path.join(output_directory, "suffolk_county_zips_census_primary.csv"))
-
-    export_df.to_csv(os.path.join(output_directory, "suffolk_county_zips_census_annotated.csv"), index=False)
+    return acs_export_obj
 
 
 if __name__ == "__main__":
@@ -424,4 +547,4 @@ if __name__ == "__main__":
     with open("config.json") as f:
         config = json.load(f)
 
-    main(config["connection_uri"], config["schema"], config["output_directory"])
+    main(config["connection_uri"], config["output_directory"], {"acs_us": "acs_us", "acs_ny": "acs_ny"})

@@ -75,7 +75,8 @@ class MyTestCase(unittest.TestCase):
         export.df.to_csv("test.csv")
 
     def test_variables_with_geo_restriction(self):
-        variable_factory = av.ACSVariableFactory(self.acs_scope, self.geo_restriction, geo_restriction_refresh = True)
+        variable_factory = av.ACSVariableFactory(self.acs_scope, self.geo_restriction,
+                                                 geo_restriction_refresh = True, geo_field='geoid_tiger')
         total = variable_factory.new("B01001", 1)
         total_male = variable_factory.new("B01001", 2)
 

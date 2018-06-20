@@ -1,6 +1,5 @@
 import pandas as pd
 import sqlalchemy as sa
-import json
 
 
 class ACSScope(object):
@@ -30,7 +29,6 @@ class GeographicRestriction(object):
     def create(self, connection, meta_data, refresh=False):
 
         schema = meta_data.schema
-        print(schema)
         if schema is None:
             full_table_name = self.name
         else:
@@ -57,7 +55,6 @@ class GeographicRestriction(object):
             for code in self.codes:
                 connection.execute(restriction_table.insert({"code": code}))
 
-
         else:
             restriction_table = meta_data.tables[self.name]
 
@@ -66,9 +63,8 @@ class GeographicRestriction(object):
         return restriction_table
 
 
-
-
 class ACSVariable(object):
+    """Parent class for defining operations"""
 
     def __truediv__(self, other):
         return ACSVariableDerived(self.series / other.series)
@@ -96,6 +92,8 @@ class ACSVariable(object):
 
 
 class ACSConstant(ACSVariable):
+
+    """A constant for example if you want to ACSConstant(1) - fraction_white"""
 
     def __init__(self, constant):
         self.constant = constant
@@ -151,7 +149,6 @@ class ACSVariableData(ACSVariable):
             restriction_table = self.geographic_restriction.restriction_table
             q = sa.sql.select([table.join(restriction_table, table.c[self.geo_field] == restriction_table.c["code"])]).where(table.c.relative_position == self.relative_position)
 
-
         self.df = pd.read_sql(q, self.acs_scope.connection)
 
         index_series = self.df[self.geo_field]
@@ -172,6 +169,8 @@ class ACSVariableDerived(ACSVariable):
 
 
 class ACSVariableFactory(object):
+
+    """Makes it easy to create ACS derivived   """
 
     def __init__(self, acs_scope, geographic_restriction=None, geo_restriction_refresh=False, geo_field="geo_name"):
         self.acs_scope = acs_scope
