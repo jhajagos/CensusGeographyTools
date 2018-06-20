@@ -160,6 +160,27 @@ def main(connection_uri, schema, output_directory):
     hispanic = variable_factory.new("B03003", 3)
     fraction_hispanic = hispanic / total
 
+    """
+    B16006
+1    Total:	50,068,537	+/-1,924
+2 Speak only English	13,361,272	+/-94,026
+3 Speak Spanish:	36,477,788	+/-96,281
+4 Speak English "very well"	20,717,430	+/-58,832
+5 Speak English "well"	6,467,544	+/-24,068
+6 Speak English "not well"	6,020,299	+/-37,079
+7 Speak English "not at all"	3,272,515	+/-31,732
+8 Speak other language	229,477	+/-5,404
+    """
+
+    hispanic_5_plus = variable_factory.new("B16006", 1)
+    hispanic_speak_spanish_5_plus = variable_factory.new("B16006", 3)
+    hispanic_speak_spanish_english_not_well_5_plus = variable_factory.new("B16006", 6)
+    hispanic_speak_spanish_english_not_all_5_plus = variable_factory.new("B16006", 7)
+
+    fraction_hispanic_speak_spanish_5_plus = hispanic_speak_spanish_5_plus / hispanic_5_plus
+    hispanic_speak_english_not_well_not_all = hispanic_speak_spanish_english_not_well_5_plus + hispanic_speak_spanish_english_not_all_5_plus
+    fraction_hispanic_speak_english_not_well_not_all = hispanic_speak_english_not_well_not_all / hispanic_5_plus
+
     male_under_5_yr = variable_factory.new("B01001", 3)
     male_5_to_9_yr = variable_factory.new("B01001", 4)
     male_10_to_14_yr = variable_factory.new("B01001", 5)
@@ -242,6 +263,13 @@ def main(connection_uri, schema, output_directory):
 11 No disability	33,467,372	+/-76,139
     """
 
+    total_18_64 = variable_factory.new("C18120", 1)
+    in_labor_force = variable_factory.new("C18120", 2)
+    unemployed = variable_factory.new("C18120", 6)
+
+    fraction_in_labor_force = in_labor_force / total_18_64
+    unemployment_rate = unemployed / in_labor_force
+
     """
     Total:	310,629,645	+/-11,780
 Below 100 percent of the poverty level	46,932,225	+/-284,072
@@ -249,7 +277,84 @@ Below 100 percent of the poverty level	46,932,225	+/-284,072
 At or above 150 percent of the poverty level	234,652,532	+/-408,43
     """
 
+    below_100_fpl = acs_scope.new("B06012", 2)
+    between_100_150_fpl = acs_scope.new("B06012", 3)
 
+    below_150_fpl = below_100_fpl + between_100_150_fpl
+
+    fraction_below_100_fpl = below_100_fpl / total
+    fraction_below_150_fpl = below_150_fpl / total
+
+    """
+    2	Total	Under 18 years	5977	5977	11776					1
+6	Total|With one type of health insurance coverage	With Medicare coverage only	0	0	11776	1				1
+7	Total|With one type of health insurance coverage	With Medicaid/means-tested public coverage only	832	832	11776		1			1
+13	Total|With two or more types of health insurance coverage	With Medicare and Medicaid/means-tested public coverage	0	0	11776			1		1
+17	Total|With two or more types of health insurance coverage	No health insurance coverage	186	186	11776				1	1
+18	Total	18 to 34 years	5414	5414	11776					1
+22	Total|With one type of health insurance coverage	With Medicare coverage only	72	72	11776	1				1
+23	Total|With one type of health insurance coverage	With Medicaid/means-tested public coverage only	861	861	11776		1			1
+29	Total|With two or more types of health insurance coverage	With Medicare and Medicaid/means-tested public coverage	16	16	11776			1		1
+33	Total|With two or more types of health insurance coverage	No health insurance coverage	761	761	11776				1	1
+34	Total	35 to 64 years	10715	10715	11776					1
+39	Total|With one type of health insurance coverage	With Medicaid/means-tested public coverage only	815	815	11776		1			1
+46	Total|With two or more types of health insurance coverage	With Medicare and Medicaid/means-tested public coverage	224	224	11776			1		1
+50	Total|With two or more types of health insurance coverage	No health insurance coverage	698	698	11776				1	1
+55	Total|With one type of health insurance coverage	With Medicare coverage only	1036	1036	11776	1				1
+62	Total|With two or more types of health insurance coverage	With Medicare and Medicaid/means-tested public coverage	182	182	11776			1		1
+66	Total|With two or more types of health insurance coverage	No health insurance coverage	0	0	11776				1	1
+    """
+
+    medicare_under_18 = variable_factory.new("B27010", 6)
+    medicaid_under_18 = variable_factory.new("B27010", 7)
+    dual_under_18 = variable_factory.new("B27010", 13)
+    no_insurance_under_18 = variable_factory.new("B27010", 17)
+
+    medicare_18_to_34 = variable_factory.new("B27010", 22)
+    medicaid_18_to_34 = variable_factory.new("B27010", 23)
+    dual_18_to_34 = variable_factory.new("B27010", 29)
+    no_insurance_18_to_34 = variable_factory.new("B27010", 33)
+
+    medicare_35_to_64 = variable_factory.new("B27010", 38)
+    medicaid_35_to_64 = variable_factory.new("B27010", 39)
+    dual_35_to_64 = variable_factory.new("B27010", 46)
+    no_insurance_35_to_64 = variable_factory.new("B27010", 50)
+
+    medicare_65_plus = variable_factory.new("B27010", 55)
+    dual_65_plus = variable_factory.new("B27010", 62)
+    no_insurance_65_plus = variable_factory("B27010", 66)
+
+    medicare = medicare_under_18 + medicare_18_to_34 + medicare_35_to_64 + medicare_65_plus
+    medicaid = medicaid_under_18 + medicaid_18_to_34 + medicaid_35_to_64
+    dual = dual_under_18 + dual_18_to_34 + dual_35_to_64 + dual_65_plus
+    no_insurance = no_insurance_under_18 + no_insurance_18_to_34 + no_insurance_35_to_64 + no_insurance_65_plus
+
+    fraction_medicare = medicare / total
+    fraction_medicaid = medicaid / total
+    fraction_dual = dual / total
+    fraction_no_insurance = no_insurance / total
+
+    """
+    relative_position	context_path	field_name	numeric_value	geoid_tiger	filter
+1    
+2	Total	Native	20867	11776	1
+7	Total|Speak Spanish	Speak English "not well"	110	11776	1
+8	Total|Speak Spanish	Speak English "not at all"	0	11776	1
+12	Total|Speak other Indo-European languages	Speak English "not well"	20	11776	1
+13	Total|Speak other Indo-European languages	Speak English "not at all"	0	11776	1
+17	Total|Speak Asian and Pacific Island languages	Speak English "not well"	0	11776	1
+18	Total|Speak Asian and Pacific Island languages	Speak English "not at all"	0	11776	1
+22	Total|Speak other languages	Speak English "not well"	0	11776	1
+23	Total|Speak other languages	Speak English "not at all"	0	11776	1
+28	Total|Speak Spanish	Speak English "well"	497	11776	1
+29	Total|Speak Spanish	Speak English "not well"	557	11776	1
+34	Total|Speak other Indo-European languages	Speak English "not well"	96	11776	1
+35	Total|Speak other Indo-European languages	Speak English "not at all"	6	11776	1
+39	Total|Speak Asian and Pacific Island languages	Speak English "not well"	44	11776	1
+40	Total|Speak Asian and Pacific Island languages	Speak English "not at all"	47	11776	1
+44	Total|Speak other languages	Speak English "not well"	0	11776	1
+45	Total|Speak other languages	Speak English "not at all"	0	11776	1
+    """
 
     export_obj = av.ACSExport([("total_population", total),
                                ("total_male", total_male),
@@ -271,6 +376,10 @@ At or above 150 percent of the poverty level	234,652,532	+/-408,43
                                ("multi_racial", fraction_multi_racial),
                                ("hispanic", hispanic),
                                ("fraction_hispanic", fraction_hispanic),
+                               ("hispanic_5_plus", hispanic_5_plus),
+                               ("hispanic_speak_spanish_5_plus", hispanic_speak_spanish_5_plus),
+                               ("hispanic_speak_english_not_well_not_all", hispanic_speak_english_not_well_not_all),
+                               ("fraction_hispanic_speak_english_not_well_not_all", fraction_hispanic_speak_english_not_well_not_all),
                                ("under_18_yr", under_18_yr),
                                ("fraction_under_18_yr", fraction_under_18_yr),
                                ("65_plus", sixty_five_plus),
@@ -280,8 +389,25 @@ At or above 150 percent of the poverty level	234,652,532	+/-408,43
                                ("fraction_more_than_35_gross_rent", fraction_more_than_35),
                                ("total_25_plus", total_25_plus),
                                ("bachelor_and_higher", bachelor_degree_or_higher),
-                               ("fraction_bachelor_and_higher", fraction_bachelor_degree_or_higher)
-                               ])
+                               ("fraction_bachelor_and_higher", fraction_bachelor_degree_or_higher),
+                               ("total_18_64", total_18_64),
+                               ("in_labor_force", in_labor_force),
+                               ("fraction_in_labor_force", fraction_in_labor_force),
+                               ("unemployed", unemployed),
+                               ("fraction_unemployed", unemployment_rate),
+                               ("below_100_fpl", below_100_fpl),
+                               ("fraction_below_100_fpl", fraction_below_100_fpl),
+                               ("below_150_fpl", below_150_fpl),
+                               ("fraction_below_150_fpl", fraction_below_150_fpl),
+                               ("medicaid", medicaid),
+                               ("fraction_medicaid", fraction_medicaid),
+                               ("medicare", medicare),
+                               ("fraction_medicare", fraction_medicare),
+                               ("dual", dual),
+                               ("fraction_dual", fraction_dual),
+                               ("no_insurance", no_insurance),
+                               ("fraction_no_insurance", fraction_no_insurance)
+                            ])
 
     export_obj.df["zip5"] = export_obj.df["geo_field"].apply(lambda x: x[6:])
 
@@ -299,73 +425,3 @@ if __name__ == "__main__":
         config = json.load(f)
 
     main(config["connection_uri"], config["schema"], config["output_directory"])
-
-
-    """
-    Total:	313,576,137	+/-10,365
-Under 18 years:	73,475,378	+/-8,041
-With one type of health insurance coverage:	65,109,722	+/-25,755
-With employer-based health insurance only	34,410,287	+/-141,052
-With direct-purchase health insurance only	3,852,219	+/-26,651
-With Medicare coverage only	202,751	+/-6,454
-With Medicaid/means-tested public coverage only	25,400,518	+/-165,975
-With TRICARE/military health coverage only	1,217,945	+/-10,014
-With VA Health Care only	26,002	+/-1,829
-With two or more types of health insurance coverage:	4,032,588	+/-30,220
-With employer-based and direct-purchase coverage	737,085	+/-11,238
-With employer-based and Medicare coverage	25,752	+/-1,612
-With Medicare and Medicaid/means-tested public coverage	167,565	+/-4,321
-Other private only combinations	355,361	+/-5,796
-Other public only combinations	13,168	+/-1,012
-Other coverage combinations	2,733,657	+/-21,451
-No health insurance coverage	4,333,068	+/-32,505
-18 to 34 years:	72,771,471	+/-13,992
-With one type of health insurance coverage:	54,202,794	+/-70,603
-With employer-based health insurance only	37,925,831	+/-76,330
-With direct-purchase health insurance only	5,787,275	+/-29,139
-With Medicare coverage only	229,426	+/-4,352
-With Medicaid/means-tested public coverage only	9,191,150	+/-36,524
-With TRICARE/military health coverage only	864,298	+/-7,638
-With VA Health Care only	204,814	+/-3,670
-With two or more types of health insurance coverage:	3,675,873	+/-30,027
-With employer-based and direct-purchase coverage	1,224,407	+/-14,066
-With employer-based and Medicare coverage	48,835	+/-1,499
-With Medicare and Medicaid/means-tested public coverage	376,465	+/-4,964
-Other private only combinations	307,982	+/-5,123
-Other public only combinations	38,731	+/-1,547
-Other coverage combinations	1,679,453	+/-17,420
-No health insurance coverage	14,892,804	+/-102,653
-35 to 64 years:	122,454,553	+/-11,795
-With one type of health insurance coverage:	94,934,763	+/-126,322
-With employer-based health insurance only	71,416,584	+/-189,264
-With direct-purchase health insurance only	9,715,444	+/-23,649
-With Medicare coverage only	2,110,731	+/-19,432
-With Medicaid/means-tested public coverage only	9,828,956	+/-63,463
-With TRICARE/military health coverage only	1,153,106	+/-9,541
-With VA Health Care only	709,942	+/-7,820
-With two or more types of health insurance coverage:	10,452,354	+/-45,356
-With employer-based and direct-purchase coverage	2,445,849	+/-28,185
-With employer-based and Medicare coverage	687,338	+/-6,606
-With direct-purchase and Medicare coverage	376,799	+/-4,727
-With Medicare and Medicaid/means-tested public coverage	2,372,431	+/-17,871
-Other private only combinations	599,045	+/-7,686
-Other public only combinations	303,901	+/-3,811
-Other coverage combinations	3,666,991	+/-27,096
-No health insurance coverage	17,067,436	+/-156,091
-65 years and over:	44,874,735	+/-6,103
-With one type of health insurance coverage:	13,064,961	+/-37,633
-With employer-based health insurance only	1,028,312	+/-7,954
-With direct-purchase health insurance only	175,021	+/-3,188
-With Medicare coverage only	11,818,560	+/-32,937
-With TRICARE/military health coverage only	13,306	+/-927
-With VA Health Care only	29,762	+/-1,226
-With two or more types of health insurance coverage:	31,402,836	+/-44,454
-With employer-based and direct-purchase coverage	39,755	+/-1,519
-With employer-based and Medicare coverage	8,997,503	+/-19,463
-With direct-purchase and Medicare coverage	8,840,780	+/-17,703
-With Medicare and Medicaid/means-tested public coverage	3,798,418	+/-22,750
-Other private only combinations	6,579	+/-542
-Other public only combinations	1,039,999	+/-6,772
-Other coverage combinations	8,679,802	+/-49,029
-No health insurance coverage	406,938	+/-7,734
-    """
