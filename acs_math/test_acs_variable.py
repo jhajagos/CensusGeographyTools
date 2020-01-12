@@ -44,7 +44,6 @@ class MyTestCase(unittest.TestCase):
 
         self.acs_scope = av.ACSScope(connection, "e", 2016, 5, "US")
 
-
     def test_setup(self):
 
         self.assertEqual("e20165us", self.acs_scope.table_prefix)
@@ -76,7 +75,7 @@ class MyTestCase(unittest.TestCase):
 
     def test_variables_with_geo_restriction(self):
         variable_factory = av.ACSVariableFactory(self.acs_scope, self.geo_restriction,
-                                                 geo_restriction_refresh = True, geo_field='geoid_tiger')
+                                                 geo_restriction_refresh=True, geo_field='geoid_tiger')
         total = variable_factory.new("B01001", 1)
         total_male = variable_factory.new("B01001", 2)
 

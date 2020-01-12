@@ -35,6 +35,7 @@ import json
 import csv
 import re
 import sys
+import argparse
 
 
 def open_csv_file(file_name, mode="w"):
@@ -173,16 +174,16 @@ def main(sequence_number_to_csv_file_name):
                                 context_path += [field_name[:-1]]
 
                             if len(context_path):
-                                    if field_name == "Other " + context_path[-1]:
-                                        context_path.pop()
-                                    else:
-                                        rcase1 = re.compile(r"(.+) \(.+\)")
+                                if field_name == "Other " + context_path[-1]:
+                                    context_path.pop()
+                                else:
+                                    rcase1 = re.compile(r"(.+) \(.+\)")
 
-                                        match = rcase1.match(context_path[-1])
-                                        if match is not None:
-                                            groups = match.groups()
-                                            if field_name == "Other " + groups[0]:
-                                                context_path.pop()
+                                    match = rcase1.match(context_path[-1])
+                                    if match is not None:
+                                        groups = match.groups()
+                                        if field_name == "Other " + groups[0]:
+                                            context_path.pop()
             i += 1
 
     with open("./support_files/table_number_to_sequence_number.json", "w") as fw:
@@ -190,10 +191,13 @@ def main(sequence_number_to_csv_file_name):
 
 
 if __name__ == "__main__":
+    arg_parse_obj = argparse.ArgumentParser(
+        description="Parses sequence number table which is needed to read the census file")
+    arg_parse_obj.add_argument("-c", "--config-json-filename", dest="config_json_filename",
+                               default="config_example.json")
+    arg_obj = arg_parse_obj.parse_args()
 
-    try:
-        import config
-    except ImportError:
-        import config_example as config
+    with open(arg_obj.config_json_filename) as f:
+        config = json.load(f)
 
-    main(config.sequence_number_table_csv_file)
+    main(config["sequence_number_table_csv_file"])

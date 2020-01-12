@@ -4,7 +4,7 @@ import csv
 import json
 import os
 import sys
-
+import argparse
 
 def open_csv_file(file_name, mode="w"):
 
@@ -49,10 +49,13 @@ def main(path_to_geographic_file):
 
 
 if __name__ == "__main__":
-    try:
-        import config
-    except ImportError:
-        import config_example as config
 
-    geography_csv_file = os.path.join(config.geography_directory, config.geography_csv_file)
+    arg_parse_obj = argparse.ArgumentParser(description="Parses geographic file for use in processing Census data so we can map names")
+    arg_parse_obj.add_argument("-c", "--config-json-filename", dest="config_json_filename", default="config_example.json")
+    arg_obj = arg_parse_obj.parse_args()
+
+    with open(arg_obj.config_json_filename) as f:
+        config = json.load(f)
+
+    geography_csv_file = os.path.join(config["geography_directory"], config["geography_csv_file"])
     main(geography_csv_file)

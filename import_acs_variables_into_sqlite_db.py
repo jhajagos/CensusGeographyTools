@@ -1,10 +1,10 @@
 import sqlalchemy as sa
 import datetime
-import config
 import time
 import csv
 import pprint
 import json
+import argparse
 
 def main(acs_json_file_name, connection_uri, variables_to_load=None, geo_conditions=None, acs_estimate_type="e", detail_type="unabridged"):
 
@@ -12,10 +12,8 @@ def main(acs_json_file_name, connection_uri, variables_to_load=None, geo_conditi
 
     with engine.connect() as connection:
 
-
         with open(acs_json_file_name, "r") as f:
             acs_files = json.load(f)
-
 
         load_dict = {}
         for variable in variables_to_load:
@@ -51,7 +49,6 @@ def main(acs_json_file_name, connection_uri, variables_to_load=None, geo_conditi
    geoid_tiger VARCHAR (15)
 )
                 """ % esc_sql_table_name)
-
 
             else:
                 print("ACS variable '%s' not found" % variable)
@@ -89,13 +86,10 @@ def load_csv_files_into_db(connection_string, data_dict, schema=None, delimiter=
                            conditions=None
                            ):
 
-    # Modified from: ??????
-
     db_engine = sa.create_engine(connection_string)
     db_connection = db_engine.connect()
 
     table_names = []
-
 
     for key in data_dict:
         table_name = data_dict[key]
@@ -203,6 +197,16 @@ def load_csv_files_into_db(connection_string, data_dict, schema=None, delimiter=
 
 
 if __name__ == "__main__":
+
+    """This was used to generate a test file for the ACS Math library"""
+
+    arg_parse_obj = argparse.ArgumentParser(description="Used to build a SQLite version of the ACS tables")
+    arg_parse_obj.add_argument("-c", "--config-json-filename", dest="config_json_filename",
+                               default="config_example.json")
+    arg_obj = arg_parse_obj.parse_args()
+
+    with open(arg_obj.config_json_filename) as f:
+        config = json.load(f)
 
     geo_restrictions = [
         '11720',
@@ -322,7 +326,6 @@ if __name__ == "__main__":
     ]
 
     geo_restrictions = ["ZCTA5 " + g for g in geo_restrictions]
-
     geo_conditions = [("geo_name", geo_restrictions)]
 
-    main(config.geography_directory + "acs_files_generated.json", "sqlite:///acs_load.db3", ["B01001", "B02001"], geo_conditions)
+    main(config["geography_directory"] + "acs_files_generated.json", "sqlite:///acs_load.db3", ["B01001", "B02001"], geo_conditions)

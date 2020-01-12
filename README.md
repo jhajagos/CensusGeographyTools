@@ -1,12 +1,20 @@
 CensusGeographyTools
 ====================
 
-A set of tools for working with the American Community Survey summary files from the US Census Bureau. The ACS
-provides detailed demographic and social information on communities and geographic regions.
+A set of tools for working with the American Community Survey summary files from the 
+US Census Bureau. The ACS provides detailed demographic and social information on 
+communities and geographic regions.
 
 Start here:
 
 https://www.census.gov/programs-surveys/acs/data/summary-file.html
+
+For 2018:
+
+```bash
+wget https://www2.census.gov/programs-surveys/acs/summary_file/2018/data/5_year_by_state/UnitedStates_All_Geographies_Not_Tracts_Block_Groups.zip
+```
+
 
 For 2016:
 

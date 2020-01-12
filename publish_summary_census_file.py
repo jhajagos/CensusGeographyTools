@@ -4,6 +4,7 @@ import csv
 import glob
 import os
 import sys
+import argparse
 
 """
 Export an ACS variable identified "B16002" across all geographies that are identified.
@@ -187,14 +188,19 @@ def main(table_to_publish, directory, geographic_unit="NY", reference_year="2013
 
 if __name__ == "__main__":
 
-    try:
-        import config
-    except ImportError:
-        import config_example as config
+    arg_parse_obj = argparse.ArgumentParser(
+        description="Parses geographic file for use in processing Census data so we can map names")
+    arg_parse_obj.add_argument("-c", "--config-json-filename", dest="config_json_filename",
+                               default="config_example.json")
+    arg_obj = arg_parse_obj.parse_args()
 
-    acs_fields = config.acs_fields_to_export
+    with open(arg_obj.config_json_filename) as f:
+        config = json.load(f)
+
+    acs_fields = config["acs_fields_to_export"]
     for acs_field in acs_fields:
-        main(acs_field, config.geography_directory, geographic_unit=config.geographic_unit,
-             reference_year=config.reference_year, years_covered=config.years_covered, abridged=False)
-        main(acs_field, config.geography_directory, geographic_unit=config.geographic_unit,
-             reference_year=config.reference_year, years_covered=config.years_covered, abridged=True)
+        main(acs_field, config["geography_directory"], geographic_unit=config["geographic_unit"],
+             reference_year=config["reference_year"], years_covered=config["years_covered"], abridged=False)
+
+        main(acs_field, config["geography_directory"], geographic_unit=config["geographic_unit"],
+             reference_year=config["reference_year"], years_covered=config["years_covered"], abridged=True)
