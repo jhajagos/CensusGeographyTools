@@ -6,13 +6,13 @@ __author__ = "janos"
     accessible.
 """
 
-import sys
 import json
 import os
 import argparse
 
 
-def main(acs_json_file, schema=None, abridged=False, load_estimates_only=True):
+def main(acs_json_file, schema=None, abridged=False, load_estimates_only=True, psql_load_script=False):
+
     if abridged:
         abridged_status = "abridged"
     else:
@@ -81,7 +81,12 @@ def main(acs_json_file, schema=None, abridged=False, load_estimates_only=True):
             full_path_file_name = table_info["file_name"]
             base_directory, file_name = os.path.split(full_path_file_name)
 
-            sql_script += """copy %s from '%s' WITH DELIMITER ','
+            if psql_load_script:
+                sql_script += "\\copy "
+            else:
+                sql_script += "copy "
+
+            sql_script += """ %s from '%s' WITH DELIMITER ','
         CSV HEADER;\n\n""" % (full_base_table_name, os.path.abspath(full_path_file_name))
 
             sql_script += """alter table %s add numeric_value double precision;\n""" % full_base_table_name
@@ -107,15 +112,19 @@ def main(acs_json_file, schema=None, abridged=False, load_estimates_only=True):
 if __name__ == "__main__":
 
     arg_parse_obj = argparse.ArgumentParser(
-        description="Creates load script for ACS census data")
-    arg_parse_obj.add_argument("-c", "--config-json-filename", dest="config_json_filename",
-                               default="config_example.json")
+        description="Creates load script for ACS census data to PostGres")
 
-    arg_parse_obj.add_argument("-s", "--schema-name", dest="config_json_filename",
-                               default="config_example.json")
+    arg_parse_obj.add_argument("-f", "acs_json_filename", dest="acs_json_filename",
+                               required=True)
+
+    arg_parse_obj.add_argument("-s", "--schema-name", dest="schema_name", required=True)
+
+    arg_parse_obj.add_argument("-a", "--abridged", dest="abridged", default=False, action="store_true",
+                               help="Load abridged version without labels")
+
+    arg_parse_obj.add_argument("-p", "--psql-load-script", default=False, dest="psql_load_script", action="store_true",
+                               help="Writes load scripts for psql command load script")
+
     arg_obj = arg_parse_obj.parse_args()
-
-    with open(arg_obj.config_json_filename) as f:
-        config = json.load(f)
-
-    main()
+    main(arg_obj.acs_json_filename, schema=arg_obj.schema_name, absridged=arg_obj.abridged,
+         psql_load_script=arg_obj.psql_load_script)

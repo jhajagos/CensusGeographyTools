@@ -269,7 +269,7 @@ def generate_acs_summary(acs_scope, geographic_restriction, geo_field):
     male_80_to_84 = variable_factory.new("B01001", 24)
     male_85_plus = variable_factory.new("B01001", 25)
 
-    male_65_plus = male_65_to_66 + male_67_to_69 + male_70_to_74 + male_75_to_79 +  male_80_to_84 + male_85_plus
+    male_65_plus = male_65_to_66 + male_67_to_69 + male_70_to_74 + male_75_to_79 + male_80_to_84 + male_85_plus
 
     female_65_to_66 = variable_factory.new("B01001", 44)
     female_67_to_69 = variable_factory.new("B01001", 45)
