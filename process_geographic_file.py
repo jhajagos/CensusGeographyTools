@@ -15,9 +15,9 @@ def open_csv_file(file_name, mode="w"):
         return open(file_name, newline="", mode=mode)
 
 
-def main(path_to_geographic_file):
+def main(path_to_geographic_file, path_to_template_file):
 
-    with open_csv_file("./support_files/2012_SFGeoFileTemplate.csv", "r") as f: # This is just a template for the header
+    with open_csv_file(path_to_template_file, "r") as f: # This is just a template for the header
         cvr = csv.reader(f)
 
         if sys.version_info[0] == 2:
@@ -51,11 +51,11 @@ def main(path_to_geographic_file):
 if __name__ == "__main__":
 
     arg_parse_obj = argparse.ArgumentParser(description="Parses geographic file for use in processing Census data so we can map names")
-    arg_parse_obj.add_argument("-c", "--config-json-filename", dest="config_json_filename", default="config_example.json")
+    arg_parse_obj.add_argument("-c", "--config-json-filename", dest="config_json_filename", default="config_2018_zcta5.json")
     arg_obj = arg_parse_obj.parse_args()
 
     with open(arg_obj.config_json_filename) as f:
         config = json.load(f)
 
     geography_csv_file = os.path.join(config["geography_directory"], config["geography_csv_file"])
-    main(geography_csv_file)
+    main(geography_csv_file, config["geographic_template_file"])
