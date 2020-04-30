@@ -51,7 +51,7 @@ def main(path_to_geographic_file, path_to_template_file):
 if __name__ == "__main__":
 
     arg_parse_obj = argparse.ArgumentParser(description="Parses geographic file for use in processing Census data so we can map names")
-    arg_parse_obj.add_argument("-c", "--config-json-filename", dest="config_json_filename", default="config_2018_zcta5.json")
+    arg_parse_obj.add_argument("-c", "--config-json-filename", dest="config_json_filename", default="config_2018_ny_tract_bg.json")
     arg_obj = arg_parse_obj.parse_args()
 
     with open(arg_obj.config_json_filename) as f:

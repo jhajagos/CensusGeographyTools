@@ -194,7 +194,7 @@ if __name__ == "__main__":
     arg_parse_obj = argparse.ArgumentParser(
         description="Parses sequence number table which is needed to read the census file")
     arg_parse_obj.add_argument("-c", "--config-json-filename", dest="config_json_filename",
-                               default="config_2018_zcta5.json")
+                               default="config_2018_ny_tract_bg.json")
     arg_obj = arg_parse_obj.parse_args()
 
     with open(arg_obj.config_json_filename) as f:

@@ -126,5 +126,5 @@ if __name__ == "__main__":
                                help="Writes load scripts for psql command load script")
 
     arg_obj = arg_parse_obj.parse_args()
-    main(arg_obj.acs_json_filename, schema=arg_obj.schema_name, absridged=arg_obj.abridged,
+    main(arg_obj.acs_json_filename, schema=arg_obj.schema_name, abridged=arg_obj.abridged,
          psql_load_script=arg_obj.psql_load_script)
