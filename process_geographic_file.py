@@ -27,7 +27,7 @@ def main(path_to_geographic_file, path_to_template_file):
             header = cvr.__next__()
             header_description = cvr.__next__()
 
-    with open(path_to_geographic_file, "r") as fc:
+    with open(path_to_geographic_file, "r", errors="replace") as fc:
         cvd = csv.DictReader(fc, header)
 
         logical_record_dict = {}
