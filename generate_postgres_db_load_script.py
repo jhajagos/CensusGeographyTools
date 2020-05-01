@@ -114,7 +114,7 @@ if __name__ == "__main__":
     arg_parse_obj = argparse.ArgumentParser(
         description="Creates load script for ACS census data to PostGres")
 
-    arg_parse_obj.add_argument("-f", "acs_json_filename", dest="acs_json_filename",
+    arg_parse_obj.add_argument("-f", "--acs_json_filename", dest="acs_json_filename",
                                required=True)
 
     arg_parse_obj.add_argument("-s", "--schema-name", dest="schema_name", required=True)
@@ -123,7 +123,7 @@ if __name__ == "__main__":
                                help="Load abridged version without labels")
 
     arg_parse_obj.add_argument("-p", "--psql-load-script", default=False, dest="psql_load_script", action="store_true",
-                               help="Writes load scripts for psql command load script")
+                               help="Writes load scripts for psql command load")
 
     arg_obj = arg_parse_obj.parse_args()
     main(arg_obj.acs_json_filename, schema=arg_obj.schema_name, abridged=arg_obj.abridged,
