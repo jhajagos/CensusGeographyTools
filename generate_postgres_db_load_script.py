@@ -86,8 +86,7 @@ def main(acs_json_file, schema=None, abridged=False, load_estimates_only=True, p
             else:
                 sql_script += "copy "
 
-            sql_script += """ %s from '%s' WITH DELIMITER ','
-        CSV HEADER;\n\n""" % (full_base_table_name, os.path.abspath(full_path_file_name))
+            sql_script += """ %s from '%s' WITH DELIMITER ',' CSV HEADER QUOTE '"';\n\n""" % (full_base_table_name, os.path.abspath(full_path_file_name))
 
             sql_script += """alter table %s add numeric_value double precision;\n""" % full_base_table_name
             sql_script += """update %s set numeric_value = case when str_value = '.' then NULL else cast(str_value as double precision) end;\n""" % full_base_table_name
