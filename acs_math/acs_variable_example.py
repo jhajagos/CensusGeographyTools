@@ -143,7 +143,7 @@ def main(connection_uri, output_directory, schema_dict):
 
     acs_scope_ny = av.ACSScope(connection, "e", 2016, 5, "ny", schema_dict["acs_ny"])
 
-    ny_geonames =  [
+    ny_geonames = [
         'New York',
         'Erie County, New York',
         'Essex County, New York',
