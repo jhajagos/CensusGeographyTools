@@ -11,7 +11,12 @@ import os
 import argparse
 
 
-def main(acs_json_file, schema=None, abridged=False, load_estimates_only=True, psql_load_script=False):
+def main(acs_json_file, schema=None, abridged=False, load_estimates_only=True, psql_load_script=False, table_space=None):
+
+    if table_space is not None:
+        table_space_str = " tablespace %s "
+    else:
+        table_space_str = ""
 
     if abridged:
         abridged_status = "abridged"
@@ -34,7 +39,7 @@ def main(acs_json_file, schema=None, abridged=False, load_estimates_only=True, p
   base_version_table_name varchar(255),
   geographic_unit varchar(255),
   created_on timestamp
-  );\n\n""" % schema
+  ) ;\n\n""" % (schema, table_space_str)
 
     for table in acs_dict:
         estimate_table_info = acs_dict[table]["e"][abridged_status]
@@ -76,7 +81,7 @@ def main(acs_json_file, schema=None, abridged=False, load_estimates_only=True, p
             for field in header:
                 create_table_sql += "    %s %s,\n" % (field, data_types_map[field])
 
-            sql_script += create_table_sql[:-2] + ");\n\n"
+            sql_script += create_table_sql[:-2] + ") %s;\n\n" % table_space_str
 
             full_path_file_name = table_info["file_name"]
             base_directory, file_name = os.path.split(full_path_file_name)
@@ -124,6 +129,8 @@ if __name__ == "__main__":
     arg_parse_obj.add_argument("-p", "--psql-load-script", default=False, dest="psql_load_script", action="store_true",
                                help="Writes load scripts for psql command load")
 
+    arg_parse_obj.add_argument("-t", "--table-space", dest="table_space", default=None, help="Specify a tablespace to load data in")
+
     arg_obj = arg_parse_obj.parse_args()
     main(arg_obj.acs_json_filename, schema=arg_obj.schema_name, abridged=arg_obj.abridged,
-         psql_load_script=arg_obj.psql_load_script)
+         psql_load_script=arg_obj.psql_load_script, table_space=arg_obj.table_space)
