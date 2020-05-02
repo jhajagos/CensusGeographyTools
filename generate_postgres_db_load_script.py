@@ -39,7 +39,7 @@ def main(acs_json_file, schema=None, abridged=False, load_estimates_only=True, p
   base_version_table_name varchar(255),
   geographic_unit varchar(255),
   created_on timestamp
-  ) ;\n\n""" % (schema, table_space_str)
+  ) %s;\n\n""" % (schema, table_space_str)
 
     for table in acs_dict:
         estimate_table_info = acs_dict[table]["e"][abridged_status]
