@@ -14,7 +14,7 @@ import argparse
 def main(acs_json_file, schema=None, abridged=False, load_estimates_only=True, psql_load_script=False, table_space=None):
 
     if table_space is not None:
-        table_space_str = " tablespace %s "
+        table_space_str = " tablespace %s " % table_space
     else:
         table_space_str = ""
 
