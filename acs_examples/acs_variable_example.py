@@ -10,7 +10,22 @@ def main(connection_uri, output_directory, schema_dict):
     engine = sa.create_engine(connection_uri)
     connection = engine.connect()
 
-    acs_scope_us = av.ACSScope(connection, "e", 2016, 5, "us", schema_dict["acs_us"])
+    # By tracts in Nassau and Suffolk
+    query_to_get_tracts = f"""select distinct geo_name from {schema_dict["acs_ny_tbg"]}."e20185nyB01001" 
+    where geo_name ~ '(^Census Tract.+Suffolk.+|^Census Tract.+Nassau.+)'"""
+
+    cursor = connection.execute(query_to_get_tracts)
+    tract_geonames = [r["geo_name"] for r in cursor]
+
+    tract_geo_restriction = av.GeographicRestriction("li_tracts", tract_geonames)
+
+    acs_scope_ny_tbg = av.ACSScope(connection, "e", 2018, 5, "ny", schema_dict["acs_ny_tbg"])
+
+    ny_export_tbg = generate_acs_summary(acs_scope_ny_tbg, tract_geo_restriction, "geo_name")
+    ny_export_tbg.write_to_csv(os.path.join(output_directory, "acs_tracts_nassau_suffolk_summary.csv"))
+
+    # By zip codes
+    acs_scope_us = av.ACSScope(connection, "e", 2018, 5, "us", schema_dict["acs_us"])
 
     suffolk_county_zips = [
         'ZCTA5 11720',
@@ -141,7 +156,7 @@ def main(connection_uri, output_directory, schema_dict):
 
     export_df.to_csv(os.path.join(output_directory, "suffolk_county_zips_census_annotated.csv"), index=False)
 
-    acs_scope_ny = av.ACSScope(connection, "e", 2016, 5, "ny", schema_dict["acs_ny"])
+    acs_scope_ny = av.ACSScope(connection, "e", 2018, 5, "ny", schema_dict["acs_ny"])
 
     ny_geonames = [
         'New York',
@@ -213,6 +228,7 @@ def main(connection_uri, output_directory, schema_dict):
     ny_export = generate_acs_summary(acs_scope_ny, ny_geo_restriction, "geo_name")
 
     ny_export.write_to_csv(os.path.join(output_directory, "new_york_census_primary.csv"))
+
 
 
 def generate_acs_summary(acs_scope, geographic_restriction, geo_field):
@@ -487,6 +503,8 @@ At or above 150 percent of the poverty level	234,652,532	+/-408,43
 
     fraction_speak_english_limited = speak_english_limited / total_5_plus
 
+    median_household_income = variable_factory.new("B19013", 1)
+
     acs_export_obj = av.ACSExport([("total_population", total),
                                ("total_male", total_male),
                                ("fraction_male", fraction_male),
@@ -536,7 +554,8 @@ At or above 150 percent of the poverty level	234,652,532	+/-408,43
                                ("dual", dual),
                                ("fraction_dual", fraction_dual),
                                ("no_insurance", no_insurance),
-                               ("fraction_no_insurance", fraction_no_insurance)
+                               ("fraction_no_insurance", fraction_no_insurance),
+                               ("median_household_income", median_household_income)
                             ])
 
     return acs_export_obj
@@ -547,4 +566,4 @@ if __name__ == "__main__":
     with open("config.json") as f:
         config = json.load(f)
 
-    main(config["connection_uri"], config["output_directory"], {"acs_us": "acs_us", "acs_ny": "acs_ny"})
+    main(config["connection_uri"], config["output_directory"], config["schemas"])

@@ -20,6 +20,7 @@ class ACSScope(object):
 
 
 class GeographicRestriction(object):
+    """Creates a table for geographic restrictions"""
 
     def __init__(self, name, codes):
         self.name = name
@@ -92,7 +93,6 @@ class ACSVariable(object):
 
 
 class ACSConstant(ACSVariable):
-
     """A constant for example if you want to ACSConstant(1) - fraction_white"""
 
     def __init__(self, constant):
@@ -141,7 +141,6 @@ class ACSVariableData(ACSVariable):
         table = self._get_table()
 
         # Geographic restriction
-
         if self.geographic_restriction is None:
             q = sa.sql.select([table]).where(table.c.relative_position == self.relative_position)
         else:
@@ -154,23 +153,21 @@ class ACSVariableData(ACSVariable):
         index_series = self.df[self.geo_field]
         numeric_series = self.df[self.numeric_field]
 
-        self.series = pd.Series(numeric_series.as_matrix(), index=index_series.as_matrix())
-
-        # print(self.df.head(10))
+        self.series = pd.Series(numeric_series.values, index=index_series.values)
 
     def _merge_dfs(self, other_df):
         pass
 
 
 class ACSVariableDerived(ACSVariable):
+    """An ACS variable derived from another variable"""
 
     def __init__(self, series):
         self.series = series
 
 
 class ACSVariableFactory(object):
-
-    """Makes it easy to create ACS derivived   """
+    """Makes it easy to create ACS derived variables, such as fraction of population"""
 
     def __init__(self, acs_scope, geographic_restriction=None, geo_restriction_refresh=False, geo_field="geo_name"):
         self.acs_scope = acs_scope
@@ -186,6 +183,7 @@ class ACSVariableFactory(object):
 
 
 class ACSExport(object):
+    """Export results as a dataframe"""
 
     def __init__(self, pairs_with_df):
         self.pairs_with_df = pairs_with_df
