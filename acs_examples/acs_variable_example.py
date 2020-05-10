@@ -229,6 +229,7 @@ def main(connection_uri, output_directory, schema_dict):
 
     ny_export.write_to_csv(os.path.join(output_directory, "new_york_census_primary.csv"))
 
+
 def generate_acs_summary(acs_scope, geographic_restriction, geo_field):
 
     variable_factory = av.ACSVariableFactory(acs_scope, geographic_restriction, geo_field)
