@@ -6,6 +6,18 @@ import os
 import sys
 import argparse
 
+<<<<<<< HEAD
+=======
+
+def open_csv_file(file_name, mode="w"):
+
+    ver_info = sys.version_info[0]
+    if ver_info == 2:
+        return open(file_name, mode=mode + "b")
+    else:
+        return open(file_name, newline="", mode=mode)
+
+>>>>>>> 57e7ca4584cb45c026a569582b33a9384468877b
 
 def main(path_to_geographic_file, path_to_template_file):
 
