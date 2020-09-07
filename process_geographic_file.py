@@ -6,28 +6,15 @@ import os
 import sys
 import argparse
 
-def open_csv_file(file_name, mode="w"):
-
-    ver_info = sys.version_info[0]
-    if ver_info == 2:
-        return open(file_name, mode=mode + "b")
-    else:
-        return open(file_name, newline="", mode=mode)
-
 
 def main(path_to_geographic_file, path_to_template_file):
 
-    with open_csv_file(path_to_template_file, "r") as f: # This is just a template for the header
+    with open(path_to_template_file, "r", newline="") as f: # This is just a template for the header
         cvr = csv.reader(f)
+        header = next(cvr)
+        header_description = next(cvr)
 
-        if sys.version_info[0] == 2:
-            header = cvr.next()
-            header_description = cvr.next() #We do not need this
-        else:
-            header = cvr.__next__()
-            header_description = cvr.__next__()
-
-    with open(path_to_geographic_file, "r", errors="replace") as fc:
+    with open(path_to_geographic_file, "r", errors="replace", newline="") as fc:
         cvd = csv.DictReader(fc, header)
 
         logical_record_dict = {}
