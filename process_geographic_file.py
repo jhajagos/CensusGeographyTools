@@ -6,6 +6,7 @@ import os
 import sys
 import argparse
 
+
 def open_csv_file(file_name, mode="w"):
 
     ver_info = sys.version_info[0]

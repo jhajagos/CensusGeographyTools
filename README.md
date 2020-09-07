@@ -44,12 +44,12 @@ Set in config.json the data directory where your downloaded files are.
 
 Run the script `process_geographic_file.py` to generate needed JSON files which are used to annotate files with geographic information.
 ```bash
-python process_geographic_file.py
+python process_geographic_file.py -c ./config_2018_ny_tract_bg.json
 ```
 
 This step writes a CSV file for each selected variable. Large amount of data is generated during this step.
 ```bash
-python publish_summary_census_file.py
+python publish_summary_census_file.py -c ./config_2018_ny_tract_bg.json
 ```
 
 ```bash
