@@ -53,7 +53,12 @@ python publish_summary_census_file.py -c ./config_2018_ny_tract_bg.json
 ```
 
 ```bash
- python generate_postgres_db_load_script.py ~/data/acs/newyork_bg_tract/acs_files_generated.json
+python3 generate_postgres_db_load_script.py -f /census/acs/2018/Full_UnitedStates_All_Geographies_Not_Tracts_Block_Groups/TX/acs_files_generated.json \
+-s acs_summary_2018tx -p -t bmi_clinical_extended
+```
+
+```bash
+psql -h bmi-clinical-informatics-p1 -U jhajagos bmi_clinical < acs_summary_2018tx_load.sql
 ```
 
 where the acs_files_generated.json points to the directory to load.
