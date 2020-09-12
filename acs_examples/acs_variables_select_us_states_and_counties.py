@@ -8,13 +8,14 @@ import os
 def main(config, output_directory="./"):
 
     state_query_dict = {
-        "tx": """select distinct geoid, geo_name from acs_summary_2018tx."e20185txB00001" where geoid like '05000US48%%' order by geo_name"""
+        "tx": """select distinct geoid, geo_name from acs_summary_2018tx."e20185txB00001" where geoid like '05000US48%%' order by geo_name""",
+        "fl": """select distinct geoid, geo_name from acs_summary_2018fl."e20185flB00001" where geoid like '05000US12%%' order by geo_name"""
     }
 
     engine = sa.create_engine(config["connection_uri"])
     schema_dict = config["schemas"]
     with engine.connect() as connection:
-        state_list = ["tx"]
+        state_list = ["tx", "fl"]
 
         for state in state_list:
             state_query = state_query_dict[state]
