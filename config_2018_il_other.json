@@ -1,6 +1,6 @@
 {
   "geography_directory": "/census/acs/2018/Full_UnitedStates_All_Geographies_Not_Tracts_Block_Groups/IL/",
-  "geography_csv_file":  "g20185ny.csv",
+  "geography_csv_file":  "g20185il.csv",
   "reference_year": "2018",
   "years_covered": "5",
   "geographic_unit": "IL",
